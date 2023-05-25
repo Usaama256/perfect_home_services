@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db/db_man");
 const bcrypt = require("bcryptjs");
-const { verify_email, login_method_user } = require("./methods");
+const { verify_email, loginMtdUser } = require("./methods");
 
+//API for registering the client
 router.post("/signup", async (req, res) => {
   const { email, username, password, phone, location } = req.body;
   if (
@@ -44,11 +45,13 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+//API to sign in the client
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  login_method_user(email, password, res);
+  loginMtdUser(email, password, res);
 });
 
+//API for viewing services
 router.get("/fetchServices", async (req, res) => {
   db.query("select * from Services", (err, result) => {
     if (err) {
@@ -60,6 +63,7 @@ router.get("/fetchServices", async (req, res) => {
   });
 });
 
+//API for viewing all service providers
 router.get("/fetchSPs", async (req, res) => {
   db.query("select * from ServiceProvider", (err, result) => {
     if (err) {
@@ -71,6 +75,7 @@ router.get("/fetchSPs", async (req, res) => {
   });
 });
 
+//API for viewing a single service provider the client
 router.get("/fetchSP/:id", async (req, res) => {
   const id = req.params.id;
   if (id == null || id == "") {
@@ -92,7 +97,5 @@ router.get("/fetchSP/:id", async (req, res) => {
     );
   }
 });
-
-router.get("/forgot-password", async (req, res) => {});
 
 module.exports = router;

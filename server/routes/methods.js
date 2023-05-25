@@ -1,10 +1,8 @@
 const bcrypt = require("bcryptjs");
 const db = require("../db/db_man");
-// const uuid = require("uuid");
-// const mime = require("mime-types");
-// const { error } = require("console");
 
-const login_method_user = (email, password, res) => {
+//Sign in method for the client
+const loginMtdUser = (email, password, res) => {
   if (email == null || email == "" || password == null || password == "") {
     res.status(400).json("Bad Request");
   } else {
@@ -16,9 +14,11 @@ const login_method_user = (email, password, res) => {
             console.log(err);
             res.status(500).json({ message: "Something went wrong" });
           } else {
+            //check whether client exists
             if (result.length < 1) {
               res.status(400).json({ message: "User Doesn't Exist" });
             } else {
+              //comapring the stored password in the database whether its matching with the password used to login
               const isVerified = await bcrypt.compare(password, result[0].hash);
               //   console.log(isVerified);
               if (isVerified) {
@@ -42,7 +42,8 @@ const login_method_user = (email, password, res) => {
   }
 };
 
-const login_method_SP = (email, password, res) => {
+//Sign in method for the service provider
+const loginMtdSP = (email, password, res) => {
   if (email == null || email == "" || password == null || password == "") {
     res.status(400).json("Bad Request");
   } else {
@@ -54,11 +55,13 @@ const login_method_SP = (email, password, res) => {
             console.log(err);
             res.status(500).json({ message: "Something went wrong" });
           } else {
+            //checking whether admin exists
             if (result.length < 1) {
               res
                 .status(400)
                 .json({ message: "ServiceProvider Doesn't Exist" });
             } else {
+              //comapring the stored password in the database whether its matching with the password used to login
               const isVerified = await bcrypt.compare(password, result[0].hash);
               //   console.log(isVerified);
               if (isVerified) {
@@ -83,7 +86,8 @@ const login_method_SP = (email, password, res) => {
   }
 };
 
-const login_method_admin = (email, password, res) => {
+//Sign in method for the admin
+const loginMtdAdmin = (email, password, res) => {
   if (email == null || email == "" || password == null || password == "") {
     res.status(400).json("Bad Request");
   } else {
@@ -95,9 +99,11 @@ const login_method_admin = (email, password, res) => {
             console.log(err);
             res.status(500).json({ message: "Something went wrong" });
           } else {
+            //checking whether admin exists
             if (result.length < 1) {
               res.status(400).json({ message: "Admin Doesn't Exist" });
             } else {
+              //comapring the stored password in the database whether its matching with the password used to login
               const isVerified = await bcrypt.compare(password, result[0].hash);
               if (isVerified) {
                 res.status(200).json({
@@ -119,6 +125,7 @@ const login_method_admin = (email, password, res) => {
   }
 };
 
+//method for verifying the correct syntax of email
 const verify_email = (email) => {
   const regex =
     /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -129,41 +136,9 @@ const verify_email = (email) => {
   }
 };
 
-// const uploadImage = async (req, res) => {
-//   try {
-//     const imgData = ({ type, data } = req.body.base64Image);
-//     // .match(
-//     //   /^data:([A-Za-z-+\/]+);base64,(.+)$/
-//     // );
-//     // const response = {};
-//     // if (image.length !== 3) {
-//     // return Error("Invalid request");
-//     // } else {
-//     // response.type = image[1];
-//     // var buffer = Buffer.from(image[2], "base64");
-//     var imgData = image.replace(/^data:image\/\w+;base64,/, "");
-//     var buffer = Buffer.from(imgData, "base64");
-//     // var buffer = Buffer.from(data, "base64");
-//     // var type = response.type;
-//     // var extension = mime.extension(type);
-//     let filename = "plumbing." + extension;
-//     fs.writeFile("./images/" + filename, buffer, (err) => {
-//       if (err) {
-//         console.log(err);
-//       } else {
-//         // console.log(buffer);
-//         res.status(200).json({ message: "Success" });
-//       }
-//     });
-//     // }
-//   } catch (e) {
-//     console.log(e);
-//   }
-// };
-
 module.exports = {
   verify_email,
-  login_method_user,
-  login_method_SP,
-  login_method_admin,
+  loginMtdUser,
+  loginMtdSP,
+  loginMtdAdmin,
 };

@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db/db_man");
-const { verify_email, login_method_SP } = require("./methods");
+const { verify_email, loginMtdSP } = require("./methods");
 const bcrypt = require("bcryptjs");
 const fs = require("fs");
 
+//API for registering the the service provider
 router.post("/signup", async (req, res) => {
   try {
     const {
@@ -31,6 +32,7 @@ router.post("/signup", async (req, res) => {
       res.status(400).json({ message: "Bad Request" });
     } else {
       if (verify_email(email)) {
+        //encrypting the password into string of and numbers using hash method,
         const hash = await bcrypt.hash(password, 10);
         const new_SP = {
           SPname,
@@ -42,7 +44,7 @@ router.post("/signup", async (req, res) => {
           hash,
         };
         db.query("insert into ServiceProvider set?", new_SP, (err) => {
-          if (err) {
+          if ((err, result)) {
             console.log(err);
             if (err.errno == 1062) {
               res
@@ -64,11 +66,13 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+//API for sign in the the service provider
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  login_method_SP(email, password, res);
+  loginMtdSP(email, password, res);
 });
 
+//API for uploading a logo
 router.post("/uploadLogo/:id", async (req, res) => {
   try {
     const SPid = req.params.id;
@@ -76,8 +80,11 @@ router.post("/uploadLogo/:id", async (req, res) => {
     if (lgName == null || lgName == "" || base64Lg == null || base64Lg == "") {
       res.status(400).json({ message: "bad request" });
     } else {
+      //replacing the first string characters of a base64image with an empty string
       const data = base64Lg.replace(/^data:image\/\w+;base64,/, "");
+      //converting the data string into base64
       const buffer = Buffer.from(data, "base64");
+      //generate the extension of the logo
       const ext = base64Lg.substring(
         "data:image/".length,
         base64Lg.indexOf(";base64")
@@ -104,6 +111,7 @@ router.post("/uploadLogo/:id", async (req, res) => {
   }
 });
 
+//API for uploading a image
 router.post("/uploadImage/:id", async (req, res) => {
   try {
     const SPid = req.params.id;
@@ -117,8 +125,11 @@ router.post("/uploadImage/:id", async (req, res) => {
       res.status(400).json({ message: "bad request" });
     } else {
       // console.log(imageData);
+      //replacing the first string characters of a base64image with an empty string
       const data = base64Img.replace(/^data:image\/\w+;base64,/, "");
+      //converting the data string into base64
       const buffer = Buffer.from(data, "base64");
+      //generate the extension of the image
       const ext = base64Img.substring(
         "data:image/".length,
         imgType.indexOf(";base64")
@@ -145,7 +156,51 @@ router.post("/uploadImage/:id", async (req, res) => {
   }
 });
 
-router.put("/update", async (req, res) => {});
-router.get("/phoneListUser", async (req, res) => {});
+//API for updating information of the service provider
+router.put("/updateSP/:id", async (req, res) => {
+  try {
+    const SPid = req.params.id;
+    const { contact, location, SPdescription } = req.body;
+    db.query(
+      `select * from ServiceProvider where SPid =${SPid}`,
+      (err, result) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json("Something Went Wrong");
+        } else {
+          if (result < 1) {
+            res.status(400).json("Invalid Request");
+          } else {
+            db.query(
+              `update ServiceProvider set contact = "${contact}", location="${location}", SPdescription = "${SPdescription}" where SPid="${SPid}"`,
+              (err, result) => {
+                if (err) {
+                  console.log(err);
+                  res.status(400).json("Failed");
+                } else {
+                  res.status(200).json("Update Successful");
+                }
+              }
+            );
+          }
+        }
+      }
+    );
+  } catch (e) {
+    console.log(error);
+    res.status(500).json('"Something went wrong"');
+  }
+});
+
+//API for viewing the contact list of users who checked a single service provider
+router.get("/phoneListUser", async (req, res) => {
+  db.query("select phone from Users", (err, result) => {
+    if (err) {
+      res.status(500).json("Something Went wrong");
+    } else {
+      res.status(200).json(result);
+    }
+  });
+});
 
 module.exports = router;
