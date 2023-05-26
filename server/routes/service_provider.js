@@ -203,4 +203,53 @@ router.get("/phoneListUser", async (req, res) => {
   });
 });
 
+//API for ratings
+router.post("/ratings/:id/:rateValue", async (req, res) => {
+  try {
+    const Spid = req.params.id;
+    const rateV = parseInt(req.params.rateValue);
+    if (Spid == null || Spid == "" || rateV == null || rateV == "") {
+      res.status(400).json("Bad request");
+    } else {
+      db.query("select reviewsNo,rateValue from Ratings", (err, result) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json("something went wrong");
+        } else {
+          //rate value from the database
+          const dbValue = parseInt(result[0].rateValue);
+          const avgRate = Number((dbValue + rateV) / 2);
+          db.query(
+            `update Ratings set rateValue="${avgRate}" where SPid="${Spid}"`,
+            (err) => {
+              if (err) {
+                console.log(err);
+                res.status(500).json("something went wrong");
+              } else {
+                const reviewNo = parseInt(result[0].reviewsNo) + 1;
+                db.query(
+                  `update Ratings set reviewsNo="${reviewNo}" where SPid="${Spid}"`,
+                  (err, result) => {
+                    if (err) {
+                      console.log(err);
+                      res.status(500).json("something went wrong");
+                    } else {
+                      res.status(200).json({
+                        reviewNumber: reviewNo,
+                        RateValue: avgRate,
+                      });
+                    }
+                  }
+                );
+              }
+            }
+          );
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = router;

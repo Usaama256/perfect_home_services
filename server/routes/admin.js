@@ -237,4 +237,33 @@ router.put("/diapproveSP/:id", async (req, res) => {
   }
 });
 
+//API for deleting the service
+router.delete("/delService/:id", async (req, res) => {
+  //service id got from the user side
+  const Sid = req.params.id;
+  if (Sid == null || Sid == "") {
+    res.status(400).json("Bad Request");
+  } else {
+    db.query(`select * from Services where Sid="${Sid}"`, (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json({ message: "Something Went Wrong" });
+      } else {
+        if (result.length <= 0) {
+          res.status(400).json({ Message: "Invalid request" });
+        } else {
+          db.query(`delete from Services where Sid="${Sid}"`, (error) => {
+            if (error) {
+              console.log(error);
+              res.status(500).json("Something went wrong");
+            } else {
+              res.status(200).json({ Message: "Deleted Sucessfully" });
+            }
+          });
+        }
+      }
+    });
+  }
+});
+
 module.exports = router;

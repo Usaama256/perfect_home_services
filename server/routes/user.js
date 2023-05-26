@@ -98,4 +98,33 @@ router.get("/fetchSP/:id", async (req, res) => {
   }
 });
 
+//API to call when the user forgets their password
+router.post("/forgotPassword", async (req, res) => {
+  try {
+    const email = req.body;
+    if (email == null || email == "") {
+      res.status(400).json("Bad request");
+    } else {
+      db.query(
+        `select email,hash from Users where email="${email}"`,
+        (error, result) => {
+          if (error) {
+            console.log(error);
+            res.status(500).json("Something went wrong");
+          } else {
+            res.json(result);
+            // if (result <= 0) {
+            //   //here we send a sucess status to protect the data from being analyzed by unauthorized users
+            //   res.status(200).json("Password reset link sent to your email");
+            // } else {
+            // }
+          }
+        }
+      );
+    }
+  } catch (err) {
+    console.log(err);
+  }
+});
+
 module.exports = router;
