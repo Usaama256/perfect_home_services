@@ -203,7 +203,25 @@ router.get("/phoneListUser", async (req, res) => {
   });
 });
 
-//API for ratings
+//API for rating the service provider
+router.post("/", async (req, res) => {
+  const reviewNo = req.body;
+  const Spid = req.params.id;
+  const rateV = parseInt(req.params.rateValue);
+  db.query(
+    `insert into Ratings set SPid="${Spid}",rateValue="${rateV}",reviewsNo="${reviewNo}"`,
+    (err) => {
+      if (err) {
+        console.log(err);
+        res.status(400).json(" Bad ");
+      } else {
+        res.status(200).json("Success");
+      }
+    }
+  );
+});
+
+//API for ratings increment
 router.post("/ratings/:id/:rateValue", async (req, res) => {
   try {
     const Spid = req.params.id;
@@ -229,7 +247,7 @@ router.post("/ratings/:id/:rateValue", async (req, res) => {
                 const reviewNo = parseInt(result[0].reviewsNo) + 1;
                 db.query(
                   `update Ratings set reviewsNo="${reviewNo}" where SPid="${Spid}"`,
-                  (err, result) => {
+                  (err) => {
                     if (err) {
                       console.log(err);
                       res.status(500).json("something went wrong");
@@ -244,6 +262,27 @@ router.post("/ratings/:id/:rateValue", async (req, res) => {
               }
             }
           );
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+//API for retrieving the comments about the service provider from the database
+router.get("/viewReviews/:id", async (req, res) => {
+  try {
+    const Spid = req.params.id;
+    if (Spid == null || Spid == "") {
+      res.status(400).json("Bad request");
+    } else {
+      db.query(`select * from Review where SPid="${Spid}"`, (err, results) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json("Something Went wrong");
+        } else {
+          res.status(200).json(results);
         }
       });
     }

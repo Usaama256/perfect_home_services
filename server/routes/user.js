@@ -127,4 +127,40 @@ router.post("/forgotPassword", async (req, res) => {
   }
 });
 
+//API for sending comments about the service provider
+router.post("/pushReview/:id", async (req, res) => {
+  try {
+    const Uid = req.params.id;
+    const { Spid, review } = req.body;
+    if (Spid == null || Spid == "" || review == null || review == "") {
+      res.status(400).json("Bad request");
+    } else {
+      db.query("select SPid from ServiceProvider", (err, result) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json("Something Went wrong");
+        } else {
+          if (Spid != result[0].SPid) {
+            res.status(400).json("Invalid request");
+          } else {
+            db.query(
+              `insert into Review set SPid="${Spid}", Reviews="${review}",Uid="${Uid}"`,
+              (err) => {
+                if (err) {
+                  console.log(err);
+                  res.status(500).json("Something Went wrong");
+                } else {
+                  res.status(200).json("Success");
+                }
+              }
+            );
+          }
+        }
+      });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 module.exports = router;
