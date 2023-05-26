@@ -1,16 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-
-ReactDOM.render(<App />, document.getElementById("root"));
-
-// import React from "react";
-// import { createRoot } from "react-dom/client";
-// import App from "./App";
-
-// const AppRenderCallback = () => {
-//   return <App />;
-// };
-// const container = document.getElementById("root");
-// const root = createRoot(container);
-// root.render(<AppRenderCallback />);
+import { HelmetProvider } from "react-helmet-async";
+ReactDOM.render(
+  <HelmetProvider>
+    <App />
+  </HelmetProvider>,
+  document.getElementById("root")
+);

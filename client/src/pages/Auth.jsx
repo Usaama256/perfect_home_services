@@ -1,4 +1,4 @@
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, Facebook, Google, Twitter } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 import { useSnackbar } from "notistack";
 import React, { useState } from "react";
@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { signInUser, signupUser } from "../redux/apiCalls";
 import { useDispatch, useSelector } from "react-redux";
 
-const Auth = () => {
+const Auth = ({ type }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const fetching = useSelector((state) => state.user.isFetching);
@@ -56,7 +56,7 @@ const Auth = () => {
   };
 
   return (
-    <Layout>
+    <Layout type={type}>
       <div className={`container ${addContClass}`} id="container">
         <div className={`arrow-back ${addContClass && "arrow-back-white"}`}>
           <Tooltip title={"Back"} arrow>
@@ -68,13 +68,13 @@ const Auth = () => {
             <h1>Create Account</h1>
             <div className="social-container">
               <Link to={() => false} className="social">
-                <i className="fab fa-facebook-f"></i>
+                <Google />
               </Link>
               <Link to={() => false} className="social">
-                <i className="fab fa-google-plus-g"></i>
+                <Facebook />
               </Link>
               <Link to={() => false} className="social">
-                <i className="fab fa-linkedin-in"></i>
+                <Twitter />
               </Link>
             </div>
             <span>or use your email for registration</span>
@@ -130,16 +130,16 @@ const Auth = () => {
         </div>
         <div className="form-container sign-in-container">
           <form action="#">
-            <h1>Sign in</h1>
+            <h1>{type === "admin" ? "Admin Login" : "User Login"}</h1>
             <div className="social-container">
               <Link to={() => false} className="social">
-                <i className="fab fa-facebook-f"></i>
+                <Google />
               </Link>
               <Link to={() => false} className="social">
-                <i className="fab fa-google-plus-g"></i>
+                <Facebook />
               </Link>
               <Link to={() => false} className="social">
-                <i className="fab fa-linkedin-in"></i>
+                <Twitter />
               </Link>
             </div>
             <span>or use your account</span>
@@ -191,7 +191,7 @@ const Auth = () => {
                 className="ghost"
                 id="signUp"
                 onClick={() => setAddContClass("right-panel-active")}
-                disabled={fetching}
+                disabled={type === "admin" ? true : fetching}
               >
                 Sign Up
               </button>
@@ -204,7 +204,26 @@ const Auth = () => {
 };
 
 const Layout = styled.div`
-  background: #f6f5f7;
+  background: ${({ type }) => {
+    if (type === "user") {
+      return "rgba(0, 0, 0, 0)";
+    } else if (type === "admin") {
+      return "linear-gradient(to right, #aa0000, #f82828)";
+    }
+    if (type === "sp") {
+      return;
+    }
+  }};
+  background: ${({ type }) => {
+    if (type === "user") {
+      return "rgba(0, 0, 0, 0)";
+    } else if (type === "admin") {
+      return "-webkit-linear-gradient(to right, #aa0000, #f82828)";
+    }
+    if (type === "sp") {
+      return;
+    }
+  }};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -244,8 +263,8 @@ const Layout = styled.div`
 
   button {
     border-radius: 20px;
-    border: 1px solid #ff4b2b;
-    background-color: #ff4b2b;
+    border: 1px solid #aa0000;
+    background-color: #aa0000;
     color: #ffffff;
     font-size: 12px;
     font-weight: bold;
@@ -297,7 +316,7 @@ const Layout = styled.div`
 
     svg {
       font-size: 30px;
-      color: black;
+      color: #aa0000;
     }
   }
 
@@ -379,9 +398,9 @@ const Layout = styled.div`
   }
 
   .overlay {
-    background: #ff416c;
-    background: -webkit-linear-gradient(to right, #ff4b2b, #ff416c);
-    background: linear-gradient(to right, #ff4b2b, #ff416c);
+    background: #aa0000;
+    background: -webkit-linear-gradient(to right, #aa0000, #f82828);
+    background: linear-gradient(to right, #aa0000, #f82828);
     background-repeat: no-repeat;
     background-size: cover;
     background-position: 0 0;
@@ -443,6 +462,10 @@ const Layout = styled.div`
     margin: 0 5px;
     height: 40px;
     width: 40px;
+    /* 
+    svg {
+      color: blue;
+    } */
   }
 
   footer {

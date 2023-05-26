@@ -1,14 +1,13 @@
 import React from "react";
-import Layout from "../components/Layout";
-import Featured from "../components/Featured";
-import Products from "../components/Products";
+import GenLayout from "../components/GenLayout";
+import TopSlider from "../components/TopSlider";
+import ServicesDisplay from "../components/ServicesDisplay";
 
 const Home = () => {
   return (
-    <Layout>
-      <Featured />
-      <Products />
-    </Layout>
+    <GenLayout title="Home" nav={true}>
+      <ServicesDisplay />
+    </GenLayout>
   );
 };
 

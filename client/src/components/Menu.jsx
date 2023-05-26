@@ -31,7 +31,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* background-color: #d1411e; */
+  /* background-color: #AA0000; */
   background-color: #faf6f5;
 
   .desc {

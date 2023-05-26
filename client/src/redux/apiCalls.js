@@ -1,5 +1,5 @@
 import axios from "axios";
-import { myRequest } from "../store/methods";
+import { myRequest } from "../store/requestMethods";
 import {
   appDataFetchStart,
   appDataFetchSuccess,

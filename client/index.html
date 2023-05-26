@@ -9,7 +9,10 @@
 
     <meta name="theme-color" content="#000000" />
     <!-- <link rel="manifest" href="%PUBLIC_URL%/manifest.json" /> -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
 
     <!-- Using Google Font -->
     <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -26,7 +29,10 @@
       name="description"
       content="Housework Services including, Laundry, Home Security, Security, Cleaning, Painting, Fumigation, Decoration and Design, Renovation"
     />
-    <meta name="keywords" content="react,material,kit,application,dashboard,admin,template" />
+    <meta
+      name="keywords"
+      content="react,material,kit,application,dashboard,admin,template"
+    />
     <meta name="author" content="Usaama Nkangi" />
     <style>
       *,
@@ -40,6 +46,27 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      window.addEventListener("scroll", () => {
+        const scrollHeight = window.pageYOffset;
+        const navBar = document.getElementById("topNav");
+        const navHeight = navBar.getBoundingClientRect().height;
+        if (navBar) {
+          if (scrollHeight > navHeight * 2) {
+            // console.log(true);
+            navBar.classList.add("fixedNav");
+          } else {
+            navBar.classList.remove("fixedNav");
+          }
+        } else {
+          console.log("Nav Failed");
+        }
+      });
+    </script>
     <script type="module" src="/src/index.jsx"></script>
+    <script
+      src="https://kit.fontawesome.com/7e46056972.js"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

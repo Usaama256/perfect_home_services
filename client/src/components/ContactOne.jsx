@@ -67,7 +67,7 @@ const Container = styled.div`
     font-weight: 600;
     display: block;
     margin-bottom: 8px;
-    color: #d1411e;
+    color: #AA0000;
     text-transform: uppercase;
   }
 
@@ -142,7 +142,7 @@ const Container = styled.div`
     bottom: -1px;
     height: 2px;
     width: 50px;
-    background: #d1411e;
+    background: #AA0000;
     content: "";
   }
 
@@ -177,7 +177,7 @@ const Container = styled.div`
   }
 
   .contact-info .single-info:hover {
-    background-color: #d1411e;
+    background-color: #AA0000;
   }
 
   .contact-info .single-info:hover i {
@@ -203,7 +203,7 @@ const Container = styled.div`
 
   .contact-info .single-info i {
     font-size: 30px;
-    color: #d1411e;
+    color: #AA0000;
     position: absolute;
     left: 40px;
     top: 40px;
@@ -240,7 +240,7 @@ const Container = styled.div`
   }
 
   .contact-info .single-info ul li a:hover {
-    color: #d1411e;
+    color: #AA0000;
   }
 `;
 export default ContactOne;

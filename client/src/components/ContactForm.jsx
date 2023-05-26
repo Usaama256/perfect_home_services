@@ -207,7 +207,7 @@ const Container = styled.div`
     top: 0;
     height: 100%;
     width: 60%;
-    background-color: #d1411e;
+    background-color: #aa0000;
     z-index: -1;
   }
 
