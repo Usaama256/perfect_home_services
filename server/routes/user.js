@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db/db_man");
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+const dotenv = require("dotenv");
+dotenv.config();
 const { verify_email, loginMtdUser } = require("./methods");
 
 //API for registering the client
@@ -99,9 +103,9 @@ router.get("/fetchSP/:id", async (req, res) => {
 });
 
 //API to call when the user forgets their password
-router.post("/forgotPassword", async (req, res) => {
+router.post("/forgotPassword/:email", async (req, res) => {
   try {
-    const email = req.body;
+    const email = req.params.email;
     if (email == null || email == "") {
       res.status(400).json("Bad request");
     } else {
@@ -112,12 +116,53 @@ router.post("/forgotPassword", async (req, res) => {
             console.log(error);
             res.status(500).json("Something went wrong");
           } else {
-            res.json(result);
-            // if (result <= 0) {
-            //   //here we send a sucess status to protect the data from being analyzed by unauthorized users
-            //   res.status(200).json("Password reset link sent to your email");
-            // } else {
-            // }
+            if (result <= 0) {
+              //here we send a sucess status to protect the data from being analyzed by unauthorized users
+              res.status(200).json("Password reset link sent to your email");
+            } else {
+              //if email exits, generate a reset token
+              const resetToken = crypto.randomBytes(40).toString("hex");
+              const resetTokenExpires = new Date(Date.now() + 60 * 60 * 1000);
+              const expiredAt = resetTokenExpires;
+
+              const transporter = nodemailer.createTransport({
+                host: "smtp.ethereal.email",
+                port: 587,
+                secure: true,
+                auth: {
+                  user: process.env.USER, // generated ethereal user
+                  pass: process.env.PASS, // generated ethereal password
+                },
+              });
+              const message = {
+                from: process.env.EMAIL_FROM,
+                to: process.env.USER,
+                subject: "Reset Password",
+                text: `To reset your password, click on the following`,
+              };
+              transporter.sendMail(message, (err, info) => {
+                if (err) {
+                  console.log(err);
+                  res.status(500).json("Some went wrong");
+                } else {
+                  res.status(200).json("link sent to your email");
+                  console.log("Message sent: %s", info.messageId);
+                }
+              });
+              //if email exists generate a password reset token and it to the database
+
+              // db.query(
+              //   "insert into resetPassword (email,reset_token,expiresAt) values (?,?,?)",
+              //   [email, resetToken, expiredAt],
+              //   (error) => {
+              //     if (error) {
+              //       console.log(error);
+              //       res.status(500).json("Something went Wrong");
+              //     } else {
+              //     }
+              //   }
+              // );
+            }
           }
         }
       );
@@ -140,7 +185,7 @@ router.post("/pushReview/:id", async (req, res) => {
           console.log(err);
           res.status(500).json("Something Went wrong");
         } else {
-          if (Spid != result[0].SPid) {
+          if (result <= 0) {
             res.status(400).json("Invalid request");
           } else {
             db.query(
@@ -160,6 +205,52 @@ router.post("/pushReview/:id", async (req, res) => {
     }
   } catch (error) {
     console.log(error);
+  }
+});
+
+router.post("/contactAttempt", async (req, res) => {
+  const { uid, Spid, type, status } = req.body;
+  if (
+    uid == null ||
+    uid == "" ||
+    Spid == null ||
+    Spid == "" ||
+    type == null ||
+    type == "" ||
+    status == null ||
+    status == ""
+  ) {
+    res.status(400).json("Bad request");
+  } else {
+    if (type == "email") {
+      db.query(
+        `insert into SPContactAttempt set Uid="${uid}",SPid="${Spid}",type=0,status="${status}"`,
+        (error) => {
+          if (error) {
+            console.log(error);
+            res.status(500).json("Something went wrong");
+          } else {
+            res.status(200).json("Success");
+          }
+        }
+      );
+    } else {
+      if (type == "phone") {
+        db.query(
+          `insert into SPContactAttempt set Uid="${uid}",SPid="${Spid}",type=1,status="${status}"`,
+          (error) => {
+            if (error) {
+              console.log(error);
+              res.status(500).json("Something went wrong");
+            } else {
+              res.status(200).json("Success");
+            }
+          }
+        );
+      } else {
+        res.status(400).json("BAd request");
+      }
+    }
   }
 });
 

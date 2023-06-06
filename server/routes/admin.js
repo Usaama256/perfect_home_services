@@ -266,4 +266,37 @@ router.delete("/delService/:id", async (req, res) => {
   }
 });
 
+router.put("/updateAttemptStatus/:id", async (req, res) => {
+  const uid = req.params.id;
+  if (uid == null || uid == "") {
+    res.status(400).json("Bad request");
+  } else {
+    db.query(
+      `select status from SPContactAttempt where Uid="${uid}"`,
+      (err, result) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json("Something went wrong");
+        } else {
+          if (result.length <= 0) {
+            res.status(400).json("Invalid Request");
+          } else {
+            db.query(
+              `update SPContactAttempt set status =1 where Uid ="${uid}"`,
+              (error) => {
+                if (error) {
+                  console.log(error);
+                  res.status(500).json("Something went wrong");
+                } else {
+                  res.status(200).json("Status Updated");
+                }
+              }
+            );
+          }
+        }
+      }
+    );
+  }
+});
+
 module.exports = router;

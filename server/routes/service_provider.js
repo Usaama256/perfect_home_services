@@ -192,15 +192,18 @@ router.put("/updateSP/:id", async (req, res) => {
   }
 });
 
-//API for viewing the contact list of users who checked a single service provider
-router.get("/phoneListUser", async (req, res) => {
-  db.query("select phone from Users", (err, result) => {
-    if (err) {
-      res.status(500).json("Something Went wrong");
-    } else {
-      res.status(200).json(result);
+//API for viewing users who checked/contacted a single service provider
+router.get("/userContacted", async (req, res) => {
+  db.query(
+    "select Uid,type from SPContactAttempt where status=1",
+    (err, results) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.json(results);
+      }
     }
-  });
+  );
 });
 
 //API for rating the service provider
