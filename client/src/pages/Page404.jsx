@@ -15,7 +15,15 @@ const ContentStyle = styled("div")(({ theme }) => ({
   padding: theme.spacing(12, 0),
 }));
 
-const Page404 = () => {
+const Page404 = ({ src }) => {
+  var homeLink = "/";
+  if (src) {
+    if (src === "sp") {
+      homeLink = "/SPdash/home";
+    } else if (src === "ad") {
+      homeLink = "/admin/home";
+    }
+  }
   return (
     <GenLayout title={"404 Page Not Found"}>
       <Container sx={{ background: "#fff4f2" }}>
@@ -35,7 +43,12 @@ const Page404 = () => {
             sx={{ height: 260, mx: "auto", my: { xs: 5, sm: 10 } }}
           />
 
-          <Button to="/" size="large" variant="contained" component={Link}>
+          <Button
+            to={homeLink}
+            size="large"
+            variant="contained"
+            component={Link}
+          >
             Go to Home
           </Button>
         </ContentStyle>

@@ -51,12 +51,14 @@
         const scrollHeight = window.pageYOffset;
         const navBar = document.getElementById("topNav");
         const navHeight = navBar.getBoundingClientRect().height;
+        // console.log(navBar, scrollHeight, navHeight);
         if (navBar) {
-          if (scrollHeight > navHeight * 2) {
-            // console.log(true);
+          if (scrollHeight > navHeight) {
             navBar.classList.add("fixedNav");
+            // console.log("FixNav 1");
           } else {
             navBar.classList.remove("fixedNav");
+            // console.log("FixNav 0");
           }
         } else {
           console.log("Nav Failed");

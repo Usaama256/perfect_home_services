@@ -27,23 +27,23 @@ const MENU_OPTIONS = [
   {
     label: "Home",
     icon: <Home />,
-    linkTo: "/",
+    linkTo: "/admin/dash/home",
   },
   {
     label: "Profile",
     icon: <Person />,
-    linkTo: "#",
+    linkTo: "/admin/dash/profile",
   },
   {
     label: "Settings",
     icon: <Settings />,
-    linkTo: "#",
+    linkTo: "/admin/dash/settings",
   },
 ];
 
 // ----------------------------------------------------------------------
 
-export default function AccountPopover() {
+const AccountPopover = () => {
   const anchorRef = useRef(null);
 
   const [open, setOpen] = useState(null);
@@ -125,4 +125,6 @@ export default function AccountPopover() {
       </MenuPopover>
     </>
   );
-}
+};
+
+export default AccountPopover;

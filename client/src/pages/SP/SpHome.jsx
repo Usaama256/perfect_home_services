@@ -1,174 +1,88 @@
 import { useTheme } from "@mui/material/styles";
-import { Grid, Container, Typography } from "@mui/material";
+import { Grid, Container, Typography, Card } from "@mui/material";
 import AppWidgetSummary from "../../components/sp/home/AppWidgetSummary";
-import AppWebsiteVisits from "../../components/sp/home/AppWebsiteVisits";
-import AppCurrentVisits from "../../components/sp/home/AppCurrentVisits";
-import AppConversionRates from "../../components/sp/home/AppConversionRates";
-import AppCurrentSubject from "../../components/sp/home/AppCurrentSubject";
-import AppNewsUpdate from "../../components/sp/home/AppNewsUpdate";
 import AppOrderTimeline from "../../components/sp/home/AppOrderTimeline";
-import AppTrafficBySite from "../../components/sp/home/AppTrafficBySite";
-import { Facebook, Google, LinkedIn, Twitter } from "@mui/icons-material";
-import AppTasks from "../../components/sp/home/AppTasks";
+import {
+  ContactPhone,
+  Reviews,
+  StackedLineChart,
+  StarBorder,
+} from "@mui/icons-material";
+import SpContactSummary from "../../components/sp/home/SpContactSummary";
 import { imgAvator } from "../../store/images";
+import { dummyClients } from "../../store/dummies";
+import { useEffect } from "react";
 
 // ----------------------------------------------------------------------
 const SpHome = () => {
+  const userActive = false;
   const theme = useTheme();
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
-        Service Provivder Dashboard
+        Dashboard
       </Typography>
 
+      {userActive === false && (
+        <Card
+          sx={{
+            backgroundColor: "#f6050583",
+            width: "100%",
+            height: "60px",
+            margin: "30px 0",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography variant="h4">Activation Pending</Typography>
+        </Card>
+      )}
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Weekly Sales"
             total={714000}
-            icon={"ant-design:android-filled"}
+            icon={<StackedLineChart />}
           />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="New Users"
+            title="Reviews"
             total={1352831}
-            color="info"
-            icon={"ant-design:apple-filled"}
+            // color="info"
+            icon={<Reviews />}
           />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Item Orders"
-            total={1723315}
-            color="warning"
-            icon={"ant-design:windows-filled"}
+            title="Contact Attempts"
+            total={900}
+            // color="warning"
+            icon={<ContactPhone />}
           />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Bug Reports"
-            total={234}
-            color="error"
-            icon={"ant-design:bug-filled"}
+            title="Ratings"
+            total={3.4}
+            // color="error"
+            icon={<StarBorder />}
           />
         </Grid>
 
-        <Grid item xs={12} md={6} lg={8}>
-          <AppWebsiteVisits
-            title="Website Visits"
-            subheader="(+43%) than last year"
-            chartLabels={[
-              "01/01/2003",
-              "02/01/2003",
-              "03/01/2003",
-              "04/01/2003",
-              "05/01/2003",
-              "06/01/2003",
-              "07/01/2003",
-              "08/01/2003",
-              "09/01/2003",
-              "10/01/2003",
-              "11/01/2003",
-            ]}
-            chartData={[
-              {
-                name: "Team A",
-                type: "column",
-                fill: "solid",
-                data: [23, 11, 22, 27, 13, 22, 37, 21, 44, 22, 30],
-              },
-              {
-                name: "Team B",
-                type: "area",
-                fill: "gradient",
-                data: [44, 55, 41, 67, 22, 43, 21, 41, 56, 27, 43],
-              },
-              {
-                name: "Team C",
-                type: "line",
-                fill: "solid",
-                data: [30, 25, 36, 30, 45, 35, 64, 52, 59, 36, 39],
-              },
-            ]}
-          />
+        <Grid item xs={12} md={12} lg={12}>
+          <SpContactSummary users={dummyClients} />
         </Grid>
 
-        <Grid item xs={12} md={6} lg={4}>
-          <AppCurrentVisits
-            title="Current Visits"
-            chartData={[
-              { label: "America", value: 4344 },
-              { label: "Asia", value: 5435 },
-              { label: "Europe", value: 1443 },
-              { label: "Africa", value: 4443 },
-            ]}
-            chartColors={[
-              theme.palette.primary.main,
-              theme.palette.chart.blue[0],
-              theme.palette.chart.violet[0],
-              theme.palette.chart.yellow[0],
-            ]}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6} lg={8}>
-          <AppConversionRates
-            title="Conversion Rates"
-            subheader="(+43%) than last year"
-            chartData={[
-              { label: "Italy", value: 400 },
-              { label: "Japan", value: 430 },
-              { label: "China", value: 448 },
-              { label: "Canada", value: 470 },
-              { label: "France", value: 540 },
-              { label: "Germany", value: 580 },
-              { label: "South Korea", value: 690 },
-              { label: "Netherlands", value: 1100 },
-              { label: "United States", value: 1200 },
-              { label: "United Kingdom", value: 1380 },
-            ]}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6} lg={4}>
-          <AppCurrentSubject
-            title="Current Subject"
-            chartLabels={[
-              "English",
-              "History",
-              "Physics",
-              "Geography",
-              "Chinese",
-              "Math",
-            ]}
-            chartData={[
-              { name: "Series 1", data: [80, 50, 30, 40, 100, 20] },
-              { name: "Series 2", data: [20, 30, 40, 80, 20, 80] },
-              { name: "Series 3", data: [44, 76, 78, 13, 43, 10] },
-            ]}
-            chartColors={[...Array(6)].map(() => theme.palette.text.secondary)}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6} lg={8}>
-          <AppNewsUpdate
-            title="News Update"
-            list={[...Array(5)].map((_, index) => ({
-              id: `13242Fq34d_${index}`,
-              title: "CED",
-              description: "Company managing director",
-              image: imgAvator,
-              postedAt: new Date(),
-            }))}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6} lg={4}>
+        {/* <Grid item xs={12} md={6} lg={4} >
           <AppOrderTimeline
             title="Order Timeline"
             list={[...Array(5)].map((_, index) => ({
@@ -184,48 +98,7 @@ const SpHome = () => {
               time: new Date(),
             }))}
           />
-        </Grid>
-
-        <Grid item xs={12} md={6} lg={4}>
-          <AppTrafficBySite
-            title="Traffic by Site"
-            list={[
-              {
-                name: "FaceBook",
-                value: 323234,
-                icon: <Facebook width={32} height={32} />,
-              },
-              {
-                name: "Google",
-                value: 341212,
-                icon: <Google width={32} height={32} />,
-              },
-              {
-                name: "Linkedin",
-                value: 411213,
-                icon: <LinkedIn width={32} height={32} />,
-              },
-              {
-                name: "Twitter",
-                value: 443232,
-                icon: <Twitter width={32} height={32} />,
-              },
-            ]}
-          />
-        </Grid>
-
-        <Grid item xs={12} md={6} lg={8}>
-          <AppTasks
-            title="Tasks"
-            list={[
-              { id: "1", label: "Create FireStone Logo" },
-              { id: "2", label: "Add SCSS and JS files if required" },
-              { id: "3", label: "Stakeholder Meeting" },
-              { id: "4", label: "Scoping & Estimations" },
-              { id: "5", label: "Sprint Showcase" },
-            ]}
-          />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Container>
   );

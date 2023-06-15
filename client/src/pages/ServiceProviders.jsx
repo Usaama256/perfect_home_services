@@ -5,7 +5,7 @@ import GenLayout from "../components/GenLayout";
 import { useLocation, useNavigate } from "react-router-dom";
 import { servicesArr } from "../store/services";
 import Slider from "../components/Slider";
-import { sPs } from "../store/dummies";
+import { dummySPs } from "../store/dummies";
 import CompanyCard from "../components/CompanyCard";
 import { Tooltip } from "@mui/material";
 import { myRequest } from "../store/requestMethods";
@@ -172,7 +172,7 @@ const ServiceProviders = () => {
         </Search>
 
         <div className="wrapper">
-          {[...sPs, ...sPs].map((item, index) => {
+          {[...dummySPs, ...dummySPs].map((item, index) => {
             return <CompanyCard {...item} key={index} />;
           })}
         </div>
@@ -180,18 +180,6 @@ const ServiceProviders = () => {
     </GenLayout>
   );
 };
-
-const SlideContainer = styled.div`
-  height: calc(100vh - 100px);
-  margin-top: 100px;
-  background-color: #aa0000;
-  overflow: hidden;
-  position: relative;
-
-  @media screen and (max-width: 480px) {
-    height: 50vh;
-  }
-`;
 
 const SPsSection = styled.div`
   padding: 100px 10px 20px 10px;

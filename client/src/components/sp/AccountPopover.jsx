@@ -27,12 +27,12 @@ const MENU_OPTIONS = [
   {
     label: "Home",
     icon: <Home />,
-    linkTo: "/",
+    linkTo: "/SPdash/home",
   },
   {
     label: "Profile",
     icon: <Person />,
-    linkTo: "#",
+    linkTo: "/SPdash/info",
   },
   {
     label: "Settings",

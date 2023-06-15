@@ -42,12 +42,7 @@ const ListItemIconStyle = styled(ListItemIcon)({
 
 // ----------------------------------------------------------------------
 
-NavItem.propTypes = {
-  item: PropTypes.object,
-  active: PropTypes.func,
-};
-
-function NavItem({ item, active }) {
+const NavItem = ({ item, active }) => {
   const theme = useTheme();
 
   const isActiveRoot = active(item.path);
@@ -147,7 +142,12 @@ function NavItem({ item, active }) {
       {info && info}
     </ListItemStyle>
   );
-}
+};
+
+NavItem.propTypes = {
+  item: PropTypes.object,
+  active: PropTypes.func,
+};
 
 const NavSection = ({ navConfig, ...other }) => {
   const { pathname } = useLocation();

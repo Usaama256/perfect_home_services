@@ -3,10 +3,9 @@ import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import { Card, Link, Container, Typography } from "@mui/material";
 import useResponsive from "../../store/hooks/useRsponsive";
-import AuthSocial from "../../components/sp/AuthSocial";
-import RegisterForm from "../../components/sp/RegisterForm";
 import { imgReg, logo_g } from "../../store/images";
 import { Helmet } from "react-helmet-async";
+import RegStepper from "../../components/sp/register/RegStepper";
 
 const RootStyle = styled("div")(({ theme }) => ({
   [theme.breakpoints.up("md")]: {
@@ -24,7 +23,7 @@ const HeaderStyle = styled("header")(({ theme }) => ({
   alignItems: "center",
   position: "absolute",
   padding: theme.spacing(3),
-  justifyContent: "space-between",
+  justifyContent: "flex-end",
   [theme.breakpoints.up("md")]: {
     alignItems: "flex-start",
     padding: theme.spacing(7, 5, 0, 7),
@@ -37,12 +36,13 @@ const SectionStyle = styled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
+  alignItems: "center",
   margin: theme.spacing(2, 0, 2, 2),
   background: "#ffffff26",
 }));
 
 const ContentStyle = styled("div")(({ theme }) => ({
-  maxWidth: 480,
+  // maxWidth: 480,
   margin: "auto",
   minHeight: "100vh",
   display: "flex",
@@ -70,15 +70,9 @@ const SPRegister = () => {
       </Helmet>
       <RootStyle>
         <HeaderStyle>
-          <img
-            alt="logo"
-            src={logo_g}
-            style={{ width: 110, cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          />
           {smUp && (
             <Typography variant="body2" sx={{ mt: { md: -2 }, color: "#fff" }}>
-              Already have an account? {""}
+              Already have an account?
               <Link
                 variant="subtitle2"
                 component={RouterLink}
@@ -93,6 +87,17 @@ const SPRegister = () => {
 
         {mdUp && (
           <SectionStyle>
+            <img
+              alt="logo"
+              src={logo_g}
+              style={{
+                width: 200,
+                cursor: "pointer",
+                borderRadius: " 10px",
+                boxShadow: "0px 5px 15px #0000005b",
+              }}
+              onClick={() => navigate("/")}
+            />
             <Typography
               variant="h3"
               sx={{ px: 5, mt: 10, mb: 5, color: "#fff" }}
@@ -109,15 +114,18 @@ const SPRegister = () => {
               Service Provider Registration
             </Typography>
 
-            <Typography sx={{ mb: 5, color: "#fff" }}>
+            {/* <Typography sx={{ mb: 5, color: "#fff" }}>
               Do More With Perfect Home Services
+            </Typography> */}
+            <Typography sx={{ mb: 5, color: "#fff" }}>
+              Enter You're Business Details
             </Typography>
+            <RegStepper />
+            {/* <AuthSocial /> */}
 
-            <AuthSocial />
+            {/* <RegisterForm /> */}
 
-            <RegisterForm />
-
-            <Typography
+            {/* <Typography
               variant="body2"
               align="center"
               sx={{ mt: 3, color: "#fff" }}
@@ -139,14 +147,14 @@ const SPRegister = () => {
                 Privacy Policy
               </Link>
               .
-            </Typography>
+            </Typography> */}
 
             {!smUp && (
               <Typography
                 variant="body2"
                 sx={{ mt: 3, textAlign: "center", color: "#fff" }}
               >
-                Already have an account?{" "}
+                Already have an account?
                 <Link
                   variant="subtitle2"
                   to="/auth/sp/login"

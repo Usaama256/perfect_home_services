@@ -4,7 +4,6 @@ import { styled } from "@mui/material/styles";
 import { Card, Link, Container, Typography } from "@mui/material";
 import { imgLogin, logo_g } from "../../store/images";
 import useResponsive from "../../store/hooks/useRsponsive";
-import AuthSocial from "../../components/sp/AuthSocial";
 import LoginForm from "../../components/sp/LoginForm";
 import { Helmet } from "react-helmet-async";
 
@@ -26,7 +25,7 @@ const HeaderStyle = styled("header")(({ theme }) => ({
   alignItems: "center",
   position: "absolute",
   padding: theme.spacing(3),
-  justifyContent: "space-between",
+  justifyContent: "flex-end",
   [theme.breakpoints.up("md")]: {
     alignItems: "flex-start",
     padding: theme.spacing(7, 5, 0, 7),
@@ -39,6 +38,7 @@ const SectionStyle = styled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   justifyContent: "center",
+  alignItems: "center",
   margin: theme.spacing(2, 0, 2, 2),
   background: "#ffffff26",
 }));
@@ -74,13 +74,6 @@ const SPLogin = () => {
       </Helmet>
       <RootStyle>
         <HeaderStyle>
-          <img
-            alt="logo"
-            src={logo_g}
-            style={{ width: 110, cursor: "pointer" }}
-            onClick={() => navigate("/")}
-          />
-
           {smUp && (
             <Typography variant="body2" sx={{ mt: { md: -2 }, color: "#fff" }}>
               Do you want to become a Service Provider?&ensp;
@@ -98,6 +91,17 @@ const SPLogin = () => {
 
         {mdUp && (
           <SectionStyle>
+            <img
+              alt="logo"
+              src={logo_g}
+              style={{
+                width: 200,
+                cursor: "pointer",
+                borderRadius: " 10px",
+                boxShadow: "0px 5px 15px #0000005b",
+              }}
+              onClick={() => navigate("/")}
+            />
             <Typography
               variant="h3"
               sx={{ px: 5, mt: 10, mb: 5, color: "#fff" }}
@@ -118,7 +122,7 @@ const SPLogin = () => {
               Enter your details below.
             </Typography>
 
-            <AuthSocial />
+            {/* <AuthSocial /> */}
 
             <LoginForm />
 

@@ -47,6 +47,11 @@ const Auth = ({ type }) => {
 
   const onSignIn = (e) => {
     e.preventDefault();
+
+    if (type === "admin") {
+      navigate("/admin/dash/home");
+    }
+
     if (signInData.user_address === "" || signInData.user_password === "") {
       enqueueSnackbar("Enter All Fields", { variant: "error" });
     } else {
@@ -172,7 +177,7 @@ const Auth = ({ type }) => {
             <div className="overlay-panel overlay-left">
               <h1>Welcome Back!</h1>
               <p>
-                Hundreds of flavors under one roof. Please login with your
+                Plenty of home services under one roof. Please login with your
                 personal info. You’re in good hands with us.
               </p>
               <button
@@ -185,16 +190,18 @@ const Auth = ({ type }) => {
               </button>
             </div>
             <div className="overlay-panel overlay-right">
-              <h1>Grab life by the fork!</h1>
-              <p>Enter your personal details and start journey with us</p>
-              <button
-                className="ghost"
-                id="signUp"
-                onClick={() => setAddContClass("right-panel-active")}
-                disabled={type === "admin" ? true : fetching}
-              >
-                Sign Up
-              </button>
+              <h1>Perfect Home Services</h1>
+              <p>Where Quality Meets Comfort</p>
+              {type !== "admin" && (
+                <button
+                  className="ghost"
+                  id="signUp"
+                  onClick={() => setAddContClass("right-panel-active")}
+                  disabled={type === "admin" ? true : fetching}
+                >
+                  Sign Up
+                </button>
+              )}
             </div>
           </div>
         </div>

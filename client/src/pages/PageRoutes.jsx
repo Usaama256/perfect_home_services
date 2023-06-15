@@ -1,7 +1,8 @@
-import React, { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import React, { lazy, Suspense, useEffect } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import Preloader from "../components/Preloader";
 import TopSlider from "../components/TopSlider";
+import { lazyImportRetry } from "../store/requestMethods";
 import AdminRoutes from "./admin/AdminRoutes";
 // import SProutes from "./SP/SProutes";
 // import SPLogin from "./SP/SPLogin";
@@ -12,14 +13,20 @@ import AdminRoutes from "./admin/AdminRoutes";
 // import ServiceProviders from "./ServiceProviders";
 // import ServiceProvider from "./ServiceProvider";
 
-const Home = lazy(() => import("./Home"));
-const Auth = lazy(() => import("./Auth"));
-const SPlogin = lazy(() => import("./SP/SPLogin"));
-const SPreister = lazy(() => import("./SP/SPRegister"));
-const SPs = lazy(() => import("./ServiceProviders"));
-const SingleSP = lazy(() => import("./ServiceProvider"));
-const P404 = lazy(() => import("./Page404"));
-const SProutes = lazy(() => import("./SP/SProutes"));
+// const Home = lazy(() =>
+//   import("./Home").then((module) => {
+//     console.log(module.default);
+//     return module;
+//   })
+// );
+const Home = lazy(() => lazyImportRetry(() => import("./Home")));
+const Auth = lazy(() => lazyImportRetry(() => import("./Auth")));
+const SPlogin = lazy(() => lazyImportRetry(() => import("./SP/SPLogin")));
+const SPreister = lazy(() => lazyImportRetry(() => import("./SP/SPRegister")));
+const SPs = lazy(() => lazyImportRetry(() => import("./ServiceProviders")));
+const SingleSP = lazy(() => lazyImportRetry(() => import("./ServiceProvider")));
+const P404 = lazy(() => lazyImportRetry(() => import("./Page404")));
+const SProutes = lazy(() => lazyImportRetry(() => import("./SP/SProutes")));
 
 const PageRoutes = () => {
   // const [IsPending, startTransition] = useTransition();

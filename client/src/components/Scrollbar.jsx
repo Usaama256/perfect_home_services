@@ -13,6 +13,9 @@ const RootStyle = styled("div")(() => ({
 
 const SimpleBarStyle = styled(SimpleBarReact)(({ theme }) => ({
   maxHeight: "100%",
+  ".simplebar-placeholder": {
+    display: "none",
+  },
   "& .simplebar-scrollbar": {
     "&:before": {
       backgroundColor: alpha(theme.palette.grey[600], 0.48),
@@ -34,12 +37,7 @@ const SimpleBarStyle = styled(SimpleBarReact)(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-Scrollbar.propTypes = {
-  children: PropTypes.node.isRequired,
-  sx: PropTypes.object,
-};
-
-export default function Scrollbar({ children, sx, ...other }) {
+const Scrollbar = ({ children, sx, ...other }) => {
   const userAgent =
     typeof navigator === "undefined" ? "SSR" : navigator.userAgent;
 
@@ -63,4 +61,11 @@ export default function Scrollbar({ children, sx, ...other }) {
       </SimpleBarStyle>
     </RootStyle>
   );
-}
+};
+
+Scrollbar.propTypes = {
+  children: PropTypes.node.isRequired,
+  sx: PropTypes.object,
+};
+
+export default Scrollbar;

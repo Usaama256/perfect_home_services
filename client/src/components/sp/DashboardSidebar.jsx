@@ -4,45 +4,46 @@ import { styled } from "@mui/material/styles";
 import {
   Box,
   Link,
-  Button,
   Drawer,
   Typography,
   Avatar,
   Stack,
+  Button,
 } from "@mui/material";
 import Scrollbar from "../../components/Scrollbar";
 // import NavSection from "../../components/NavSection";
-import { imgAvator, logo_g } from "../../store/images";
+import { logo_g } from "../../store/images";
 import useResponsive from "../../store/hooks/useRsponsive";
-import { Analytics, Inventory2, PeopleAlt, Reviews } from "@mui/icons-material";
+import {
+  Analytics,
+  Info,
+  Inventory2,
+  Logout,
+  Reviews,
+} from "@mui/icons-material";
 import NavSection from "./NavSection";
-
-const account = {
-  displayName: "Kimuli Jamil",
-  email: "demo@here.cc",
-  photoURL: imgAvator,
-};
+import { dummySPs } from "../../store/dummies";
 
 const navConfig = [
   {
     title: "dashboard",
-    path: "/home",
+    path: "/SPdash/home",
     icon: <Analytics width={22} height={22} />,
   },
   {
-    title: "user",
-    path: "/user",
-    icon: <PeopleAlt width={22} height={22} />,
-  },
-  {
-    title: "product",
-    path: "/products",
+    title: "products / services",
+    path: "/SPdash/products",
     icon: <Inventory2 width={22} height={22} />,
   },
   {
     title: "reviews",
-    path: "/reviews",
+    path: "/SPdash/reviews",
     icon: <Reviews width={22} height={22} />,
+  },
+  {
+    title: "Company Info",
+    path: "/SPdash/info",
+    icon: <Info width={22} height={22} />,
   },
 ];
 
@@ -65,6 +66,7 @@ const AccountStyle = styled("div")(({ theme }) => ({
 
 const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
   const { pathname } = useLocation();
+  const SP = dummySPs[0];
 
   const isDesktop = useResponsive("up", "lg");
 
@@ -90,16 +92,13 @@ const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
         <img src={logo_g} alt="alt" width="100%" />
       </Box>
 
-      <Box sx={{ mb: 5, mx: 2.5 }}>
-        <Link underline="none" component={RouterLink} to="#">
+      <Box style={{ margin: "2.5px 5px" }}>
+        <Link underline="none" component={RouterLink} to="/SPdash/info">
           <AccountStyle>
-            <Avatar src={account.photoURL} alt="photoURL" />
+            <Avatar src={SP.logo} alt="photoURL" />
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: "text.primary" }}>
-                {account.displayName}
-              </Typography>
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                {account.role}
+                {SP.title}
               </Typography>
             </Box>
           </AccountStyle>
@@ -115,7 +114,11 @@ const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
           alignItems="center"
           spacing={3}
           sx={{ pt: 5, borderRadius: 2, position: "relative" }}
-        ></Stack>
+        >
+          <Button variant="outlined" color="primary" startIcon={<Logout />}>
+            Log Out
+          </Button>
+        </Stack>
       </Box>
     </Scrollbar>
   );

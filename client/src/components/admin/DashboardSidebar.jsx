@@ -4,21 +4,29 @@ import { styled } from "@mui/material/styles";
 import {
   Box,
   Link,
-  Button,
   Drawer,
   Typography,
   Avatar,
   Stack,
+  Button,
 } from "@mui/material";
 import Scrollbar from "../../components/Scrollbar";
 // import NavSection from "../../components/NavSection";
 import { imgAvator, logo_g } from "../../store/images";
 import useResponsive from "../../store/hooks/useRsponsive";
-import { Analytics, Inventory2, PeopleAlt, Reviews } from "@mui/icons-material";
+import {
+  Analytics,
+  Business,
+  Inventory2,
+  Logout,
+  PeopleAlt,
+  Settings,
+} from "@mui/icons-material";
 import NavSection from "./NavSection";
 
 const account = {
   displayName: "Kimuli Jamil",
+  role: "Manager",
   email: "demo@here.cc",
   photoURL: imgAvator,
 };
@@ -26,24 +34,29 @@ const account = {
 const navConfig = [
   {
     title: "dashboard",
-    path: "/home",
+    path: "/admin/dash/home",
     icon: <Analytics width={22} height={22} />,
   },
   {
-    title: "user",
-    path: "/user",
-    icon: <PeopleAlt width={22} height={22} />,
-  },
-  {
-    title: "product",
-    path: "/products",
+    title: "Services",
+    path: "/admin/dash/services",
     icon: <Inventory2 width={22} height={22} />,
   },
   {
-    title: "reviews",
-    path: "/reviews",
-    icon: <Reviews width={22} height={22} />,
+    title: "service providers",
+    path: "/admin/dash/sps",
+    icon: <Business width={22} height={22} />,
   },
+  {
+    title: "users",
+    path: "/admin/dash/users",
+    icon: <PeopleAlt width={22} height={22} />,
+  },
+  // {
+  //   title: "settings",
+  //   path: "/admin/dash/settings",
+  //   icon: <Settings width={22} height={22} />,
+  // },
 ];
 
 const DRAWER_WIDTH = 280;
@@ -91,7 +104,7 @@ const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
       </Box>
 
       <Box sx={{ mb: 5, mx: 2.5 }}>
-        <Link underline="none" component={RouterLink} to="#">
+        <Link underline="none" component={RouterLink} to="/admin/dash/profile">
           <AccountStyle>
             <Avatar src={account.photoURL} alt="photoURL" />
             <Box sx={{ ml: 2 }}>
@@ -115,7 +128,11 @@ const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
           alignItems="center"
           spacing={3}
           sx={{ pt: 5, borderRadius: 2, position: "relative" }}
-        ></Stack>
+        >
+          <Button variant="outlined" color="primary" startIcon={<Logout />}>
+            Log Out
+          </Button>
+        </Stack>
       </Box>
     </Scrollbar>
   );

@@ -40,7 +40,7 @@ const ContactOne = () => {
             <h3>Mail at</h3>
             <ul>
               <li>
-                <a href="mailto:info@kawu.ug">info@breusa.ug</a>
+                <a href="mailto:info@perfecthomes.ug">info@perfecthomes.ug</a>
               </li>
             </ul>
           </div>

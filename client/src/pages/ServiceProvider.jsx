@@ -4,7 +4,7 @@ import styled from "styled-components";
 import GenLayout from "../components/GenLayout";
 import { useLocation, useNavigate } from "react-router-dom";
 import Slider from "../components/Slider";
-import { sPs } from "../store/dummies";
+import { dummySPs } from "../store/dummies";
 import { Tooltip } from "@mui/material";
 import { useSnackbar } from "notistack";
 import Breadcrumb from "../components/Breadcrumb";
@@ -34,11 +34,11 @@ const ServiceProvider = () => {
 
   //Fetching Selected Service provider
   useEffect(() => {
-    const index = sPs.findIndex((item) => item.id === spId);
+    const index = dummySPs.findIndex((item) => item.id === spId);
     if (index === -1) {
       navigate("/404");
     } else {
-      setCurrentSP(sPs[index]);
+      setCurrentSP(dummySPs[index]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spId]);
@@ -118,15 +118,28 @@ const ServiceProvider = () => {
                 <Email />
                 &ensp;&ensp;
                 {seeContacts.email ? (
-                  <span onClick={() => onEmailSP(currentSP?.email)}>
-                    {currentSP?.email}
-                  </span>
+                  currentSP?.email?.map((i, n) => {
+                    if (n === currentSP?.email?.length - 1) {
+                      return (
+                        <span key={n} onClick={() => onEmailSP(i)}>
+                          {i}.
+                        </span>
+                      );
+                    } else {
+                      return (
+                        <span key={n} onClick={() => onEmailSP(i)}>
+                          {i},&ensp;
+                        </span>
+                      );
+                    }
+                  })
                 ) : (
                   <span onClick={() => seeContactsHandler(1)}>
-                    Click to reveal email
+                    Click to reveal email(s)
                   </span>
                 )}
               </div>
+
               <div className="detail_item">
                 <Phone />
                 &ensp;&ensp;

@@ -1,11 +1,20 @@
 import PropTypes from "prop-types";
 import { alpha, styled } from "@mui/material/styles";
-import { Box, Stack, AppBar, Toolbar, IconButton } from "@mui/material";
+import {
+  Box,
+  Stack,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Typography,
+  Tooltip,
+} from "@mui/material";
 import Searchbar from "./Searchbar";
 import AccountPopover from "./AccountPopover";
 import LanguagePopover from "./LanguagePopover";
 import NotificationsPopover from "./NotificationsPopover";
-import { Menu } from "@mui/icons-material";
+import { Home, Menu } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 // ----------------------------------------------------------------------
 
@@ -34,6 +43,7 @@ const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 const DashboardNavbar = ({ onOpenSidebar }) => {
+  const navigate = useNavigate();
   return (
     <RootStyle>
       <ToolbarStyle>
@@ -44,7 +54,9 @@ const DashboardNavbar = ({ onOpenSidebar }) => {
           <Menu />
         </IconButton>
 
-        <Searchbar />
+        <Typography color="text.primary" variant="h4">
+          Admin Section
+        </Typography>
         <Box sx={{ flexGrow: 1 }} />
 
         <Stack
@@ -52,6 +64,18 @@ const DashboardNavbar = ({ onOpenSidebar }) => {
           alignItems="center"
           spacing={{ xs: 0.5, sm: 1.5 }}
         >
+          <Tooltip title="Landing Page" arrow>
+            <IconButton
+              onClick={() => navigate("/")}
+              sx={{
+                padding: 0,
+                width: 44,
+                height: 44,
+              }}
+            >
+              <Home />
+            </IconButton>
+          </Tooltip>
           <LanguagePopover />
           <NotificationsPopover />
           <AccountPopover />

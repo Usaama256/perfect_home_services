@@ -18,22 +18,14 @@ const IconWrapperStyle = styled("div")(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-AppWidgetSummary.propTypes = {
-  color: PropTypes.string,
-  icon: PropTypes.string,
-  title: PropTypes.string.isRequired,
-  total: PropTypes.number.isRequired,
-  sx: PropTypes.object,
-};
-
-export default function AppWidgetSummary({
+const AppWidgetSummary = ({
   title,
   total,
   icon,
   color = "primary",
   sx,
   ...other
-}) {
+}) => {
   return (
     <Card
       sx={{
@@ -66,4 +58,14 @@ export default function AppWidgetSummary({
       </Typography>
     </Card>
   );
-}
+};
+
+AppWidgetSummary.propTypes = {
+  color: PropTypes.string,
+  icon: PropTypes.node,
+  title: PropTypes.string.isRequired,
+  total: PropTypes.number.isRequired,
+  sx: PropTypes.object,
+};
+
+export default AppWidgetSummary;
