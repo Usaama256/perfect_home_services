@@ -15,9 +15,11 @@ router.post("/signup", async (req, res) => {
     email == null ||
     email == "" ||
     username == null ||
+    username == "" ||
     phone == "" ||
     location == null ||
-    phone == ""
+    location == "" ||
+    phone == null
   ) {
     res.status(400).json({ message: "Bad Request" });
   } else {
@@ -39,7 +41,6 @@ router.post("/signup", async (req, res) => {
             res.status(400).json({ message: "Bad request" });
           }
         } else {
-          //   login_method(email, password);
           res.status(200).json({ message: "User Registerd Successfully" });
         }
       });
@@ -62,21 +63,72 @@ router.get("/fetchServices", async (req, res) => {
       console.log(err);
       res.status(500).json("Something went wrong");
     } else {
-      res.status(200).json(result);
+      // { id: "S31QsB", name: "Electrical Services", desc: "", imgs: electrical }
+      const filtered = result.map((i, n) => {
+        return {
+          id: i.Sid,
+          name: i.Sname,
+          desc: "",
+          imgs: JSON.parse(i.images),
+          // imgs: i.images,
+        };
+      });
+      res.status(200).json(filtered);
     }
   });
 });
 
-//API for viewing all service providers
+//API for user Viewing  all service providers
 router.get("/fetchSPs", async (req, res) => {
-  db.query("select * from ServiceProvider", (err, result) => {
-    if (err) {
-      console.log(err);
-      res.status(500).json("Something went wrong");
-    } else {
-      res.status(200).json(result);
+  db.query(
+    "select SPid, SPname, email, contact, logoImg, description, status, Approved, location, reviewsNo, rateValue  from ServiceProvider join Ratings using (SPid) where status='active' and Approved=1;",
+    (err, sps) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json("Something went wrong");
+      } else {
+        if (sps.length <= 0) {
+          res.status(404).json("No records Found");
+        } else {
+          const filtered = [];
+          sps.forEach(async (i, n) => {
+            db.query(
+              `select * from SpProducts where SPid=${i.SPid};`,
+              (err, pdts) => {
+                if (err) {
+                  console.log(err);
+                  res.status(500).json("Something went wrong");
+                } else {
+                  const filteredPdts = pdts.map((i, n) => {
+                    return {
+                      ...i,
+                      images: JSON.parse(i.images),
+                    };
+                  });
+                  const sp = {
+                    id: i.SPid,
+                    desc: i.description,
+                    title: i.SPname,
+                    sId: i.Sid,
+                    location: i.location,
+                    email: [i.email],
+                    tel: [i.contact],
+                    rating: { value: i.rateValue, reviews: i.reviewsNo },
+                    pricing: filteredPdts,
+                  };
+                  filtered.push(sp);
+
+                  if (filtered.length == sps.length) {
+                    return res.status(200).json(filtered);
+                  }
+                }
+              }
+            );
+          });
+        }
+      }
     }
-  });
+  );
 });
 
 //API for viewing a single service provider the client
@@ -172,7 +224,7 @@ router.post("/forgotPassword/:email", async (req, res) => {
   }
 });
 
-//API for sending comments about the service provider
+//API for sending comments/reviews about the selected service provider
 router.post("/pushReview/:id", async (req, res) => {
   try {
     const Uid = req.params.id;
@@ -180,34 +232,35 @@ router.post("/pushReview/:id", async (req, res) => {
     if (Spid == null || Spid == "" || review == null || review == "") {
       res.status(400).json("Bad request");
     } else {
-      db.query("select SPid from ServiceProvider", (err, result) => {
-        if (err) {
-          console.log(err);
-          res.status(500).json("Something Went wrong");
-        } else {
-          if (result <= 0) {
-            res.status(400).json("Invalid request");
+      // db.query("select SPid from ServiceProvider", (err, result) => {
+      //   if (err) {
+      //     console.log(err);
+      //     res.status(500).json(" Went wrong");
+      //   } else {
+      //     if (result <= 0) {
+      //       res.status(400).json("Invalid request");
+      //     } else {
+      db.query(
+        `insert into Review set SPid="${Spid}", Reviews="${review}",Uid="${Uid}"`,
+        (err) => {
+          if (err) {
+            console.log(err);
+            res.status(500).json("Something Went wrong");
           } else {
-            db.query(
-              `insert into Review set SPid="${Spid}", Reviews="${review}",Uid="${Uid}"`,
-              (err) => {
-                if (err) {
-                  console.log(err);
-                  res.status(500).json("Something Went wrong");
-                } else {
-                  res.status(200).json("Success");
-                }
-              }
-            );
+            res.status(200).json("Success");
           }
         }
-      });
+      );
     }
+    // }
+    // });
+    // }
   } catch (error) {
     console.log(error);
   }
 });
 
+//API for making a call attempt
 router.post("/contactAttempt", async (req, res) => {
   const { uid, Spid, type, status } = req.body;
   if (
@@ -248,7 +301,7 @@ router.post("/contactAttempt", async (req, res) => {
           }
         );
       } else {
-        res.status(400).json("BAd request");
+        res.status(400).json("Bad request");
       }
     }
   }

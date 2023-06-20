@@ -39,7 +39,7 @@ router.post("/signup", async (req, res) => {
           email,
           contact,
           SPtype,
-          SPdescription,
+          desc,
           location,
           hash,
         };
@@ -72,35 +72,102 @@ router.post("/login", async (req, res) => {
   loginMtdSP(email, password, res);
 });
 
+//Adding product
+router.post("/addPdt/:SPid", async (req, res) => {
+  const SPid = parseInt(req.params.SPid, 10);
+  const { name, price, desc, images, currency } = req.body;
+  if (req.params.SPid.length <= 0) {
+    return res.status(400).json("Bad Request");
+  } else {
+    const newPdt = { name, price, desc, images, currency, SPid };
+    db.query(
+      `insert into SpProducts set? where SPid='${SPid}'`,
+      newPdt,
+      (err, result) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json("Something went wrong");
+        } else {
+          return res.status(200).json("Success");
+        }
+      }
+    );
+  }
+});
+
+//Fetching all product
+router.get("/getPdts/:SPid", async (req, res) => {
+  const SPid = parseInt(req.params.SPid, 10);
+  if (req.params.SPid.length <= 0) {
+    return res.status(400).json("Bad Request");
+  } else {
+    db.query(`select * from SpProducts where SPid='${SPid}'`, (err, result) => {
+      if (err) {
+        console.log(err);
+        return res.status(500).json("Something went wrong");
+      } else {
+        return res.status(200).json(result);
+      }
+    });
+  }
+});
+
+//Update product
+router.post("/addPdt/:SPid/:Pid", async (req, res) => {
+  const SPid = parseInt(req.params.SPid, 10);
+  const Pid = parseInt(req.params.Pid, 10);
+  const { name, price, desc, images, currency } = req.body;
+
+  if (req.params.SPid.length <= 0) {
+    return res.status(400).json("Bad Request");
+  } else {
+    const newPdt = { name, price, desc, images, currency };
+    db.query(
+      `update SpProducts set? where SPid='${SPid}' and id=${Pid}`,
+      newPdt,
+      (err, result) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json("Something went wrong");
+        } else {
+          return res.status(200).json("Success");
+        }
+      }
+    );
+  }
+});
+
 //API for uploading a logo
 router.post("/uploadLogo/:id", async (req, res) => {
   try {
     const SPid = req.params.id;
-    const { lgName, base64Lg } = req.body;
-    if (lgName == null || lgName == "" || base64Lg == null || base64Lg == "") {
-      res.status(400).json({ message: "bad request" });
+    const base64Lg = req.body.base64Img;
+    if (base64Lg == null || base64Lg == "") {
+      res.status(400).json({ message: "Bad request" });
     } else {
       //replacing the first string characters of a base64image with an empty string
       const data = base64Lg.replace(/^data:image\/\w+;base64,/, "");
       //converting the data string into base64
       const buffer = Buffer.from(data, "base64");
-      //generate the extension of the logo
+      //generate the extension of the image logo
       const ext = base64Lg.substring(
         "data:image/".length,
         base64Lg.indexOf(";base64")
       );
-      const fName = `logo_${SPid}.${ext}`;
+      //creating the name of a file
+      var fName = `logo_${SPid}.${ext}`;
       fs.writeFile(`./images/SPlogo/${fName}`, buffer, (err) => {
         if (err) {
           console.log(err);
         } else {
-          const lgData = { lgName, base64Lg, SPid };
-          db.query("insert into logos set ?", lgData, (err) => {
+          const lgData = { fName, base64Lg, SPid };
+          db.query("insert into logos set ?", lgData, (err, result) => {
             if (err) {
               console.log(err);
               res.status(500).json("Something Went Wrong");
             } else {
-              res.status(200).json({ message: "Success" });
+              res.status(200).json(result);
+              // { message: "Success" }
             }
           });
         }
@@ -115,14 +182,9 @@ router.post("/uploadLogo/:id", async (req, res) => {
 router.post("/uploadImage/:id", async (req, res) => {
   try {
     const SPid = req.params.id;
-    const { imgName, base64Img } = req.body;
-    if (
-      imgName == null ||
-      imgName == "" ||
-      base64Img == null ||
-      base64Img == ""
-    ) {
-      res.status(400).json({ message: "bad request" });
+    const base64Img = req.body.base64Img;
+    if (base64Img == null || base64Img == "") {
+      res.status(400).json({ message: "Bad request" });
     } else {
       // console.log(imageData);
       //replacing the first string characters of a base64image with an empty string
@@ -132,14 +194,14 @@ router.post("/uploadImage/:id", async (req, res) => {
       //generate the extension of the image
       const ext = base64Img.substring(
         "data:image/".length,
-        imgType.indexOf(";base64")
+        base64Img.indexOf(";base64")
       );
       const fName = `img_${SPid}.${ext}`;
       fs.writeFile(`./images/SPImages/${fName}`, buffer, (err) => {
         if (err) {
           console.log(err);
         } else {
-          const imgData = { imgName, base64Img, SPid };
+          const imgData = { fName, base64Img, SPid };
           db.query("insert into images set ?", [imgData], (err) => {
             if (err) {
               console.log(err);
@@ -160,7 +222,7 @@ router.post("/uploadImage/:id", async (req, res) => {
 router.put("/updateSP/:id", async (req, res) => {
   try {
     const SPid = req.params.id;
-    const { contact, location, SPdescription } = req.body;
+    const { contact, location, desc } = req.body;
     db.query(
       `select * from ServiceProvider where SPid =${SPid}`,
       (err, result) => {
@@ -173,7 +235,7 @@ router.put("/updateSP/:id", async (req, res) => {
           } else {
             db.query(
               `update ServiceProvider set contact = "${contact}", location="${location}", SPdescription = "${SPdescription}" where SPid="${SPid}"`,
-              (err, result) => {
+              (err) => {
                 if (err) {
                   console.log(err);
                   res.status(400).json("Failed");
@@ -207,25 +269,29 @@ router.get("/userContacted", async (req, res) => {
 });
 
 //API for rating the service provider
-router.post("/", async (req, res) => {
-  const reviewNo = req.body;
+router.post("/rateSP/:id/:rateValue", async (req, res) => {
+  const reviewNo = req.body.reviewNo;
   const Spid = req.params.id;
-  const rateV = parseInt(req.params.rateValue);
-  db.query(
-    `insert into Ratings set SPid="${Spid}",rateValue="${rateV}",reviewsNo="${reviewNo}"`,
-    (err) => {
-      if (err) {
-        console.log(err);
-        res.status(400).json(" Bad ");
-      } else {
-        res.status(200).json("Success");
+  const rateValue = parseInt(req.params.rateValue);
+  if (reviewNo == null || reviewNo == "") {
+    return res.status(400).json("Bad request");
+  } else {
+    db.query(
+      `insert into Ratings set SPid="${Spid}",rateValue="${rateValue}",reviewsNo="${reviewNo}"`,
+      (err) => {
+        if (err) {
+          console.log(err);
+          res.status(400).json("Something Went wrong");
+        } else {
+          res.status(200).json("Success");
+        }
       }
-    }
-  );
+    );
+  }
 });
 
 //API for ratings increment
-router.post("/ratings/:id/:rateValue", async (req, res) => {
+router.put("/ratingRise/:id/:rateValue", async (req, res) => {
   try {
     const Spid = req.params.id;
     const rateV = parseInt(req.params.rateValue);
@@ -240,28 +306,19 @@ router.post("/ratings/:id/:rateValue", async (req, res) => {
           //rate value from the database
           const dbValue = parseInt(result[0].rateValue);
           const avgRate = Number((dbValue + rateV) / 2);
+          const reviewNo = parseInt(result[0].reviewsNo) + 1;
           db.query(
-            `update Ratings set rateValue="${avgRate}" where SPid="${Spid}"`,
-            (err) => {
+            `update Ratings set rateValue="${avgRate}",reviewsNo="${reviewNo}" where SPid="${Spid}"`,
+            (err, result) => {
               if (err) {
                 console.log(err);
                 res.status(500).json("something went wrong");
               } else {
-                const reviewNo = parseInt(result[0].reviewsNo) + 1;
-                db.query(
-                  `update Ratings set reviewsNo="${reviewNo}" where SPid="${Spid}"`,
-                  (err) => {
-                    if (err) {
-                      console.log(err);
-                      res.status(500).json("something went wrong");
-                    } else {
-                      res.status(200).json({
-                        reviewNumber: reviewNo,
-                        RateValue: avgRate,
-                      });
-                    }
-                  }
-                );
+                if (result.affectedRows == 0) {
+                  res.status(400).json("Invalid Request");
+                } else {
+                  res.status(200).json(result);
+                }
               }
             }
           );

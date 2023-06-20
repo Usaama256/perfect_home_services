@@ -129,32 +129,19 @@ router.put("/editService/:id", async (req, res) => {
     const images = req.body.images;
 
     if (Sid == "" || Sid == null || images == "" || images == null) {
-      res.status(401).json("Bad request");
+      return res.status(401).json("Bad request");
     } else {
-      db.query(`select * from Services where Sid =${Sid}`, (err, result) => {
-        if (err) {
-          console.log(err);
-          res.status(500).json("Something Went Wrong");
-        } else {
-          //checking if the result exists in the database
-          if (result < 1) {
-            res.status(400).json("Invalid Request");
+      db.query(
+        `update Services set images="${images}" where Sid = "${Sid}"`,
+        (err) => {
+          if (err) {
+            console.log(err);
+            res.status(400).json("Update Failed");
           } else {
-            db.query(
-              "update Services set images=? where Sid = ?",
-              [images, Sid],
-              (err) => {
-                if (err) {
-                  console.log(err);
-                  res.status(400).json("Update Failed");
-                } else {
-                  res.status(200).json("Order updated");
-                }
-              }
-            );
+            res.status(200).json("Service updated");
           }
         }
-      });
+      );
     }
   } catch (error) {
     console.log(error);
@@ -166,10 +153,10 @@ router.put("/editService/:id", async (req, res) => {
 router.get("/viewSP/:id", async (req, res) => {
   const SPid = req.params.id;
   if (SPid == null || SPid == "") {
-    res.status(400).json("Bad Request");
+    return res.status(400).json("Bad Request");
   } else {
     db.query(
-      `select SPname,email,contact,SPtype,SPdescription,location from ServiceProvider where SPid=${SPid}`,
+      `select * from ServiceProvider where SPid=${SPid}`,
       (err, result) => {
         if (err) {
           console.log(err);
@@ -187,9 +174,9 @@ router.get("/viewSP/:id", async (req, res) => {
 
 //API for aproving the service provider by the admin
 router.put("/approveSP/:id", async (req, res) => {
-  const Spid = req.params.id;
+  const Spid = req.body.id;
   if (Spid == null || Spid == "") {
-    res.status(400).json("Bad request");
+    return res.status(400).json("Bad request");
   } else {
     db.query(
       `update ServiceProvider set Approve =1 where SPid=${Spid}`,
@@ -257,7 +244,7 @@ router.delete("/delService/:id", async (req, res) => {
               console.log(error);
               res.status(500).json("Something went wrong");
             } else {
-              res.status(200).json({ Message: "Deleted Sucessfully" });
+              res.status(200).json({ Message: "Service Deleted" });
             }
           });
         }
@@ -266,6 +253,7 @@ router.delete("/delService/:id", async (req, res) => {
   }
 });
 
+//API to update the state of the contactAttempt
 router.put("/updateAttemptStatus/:id", async (req, res) => {
   const uid = req.params.id;
   if (uid == null || uid == "") {

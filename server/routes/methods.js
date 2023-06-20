@@ -16,7 +16,7 @@ const loginMtdUser = (email, password, res) => {
           } else {
             //check whether client exists
             if (result.length < 1) {
-              res.status(400).json({ message: "User Doesn't Exist" });
+              res.status(400).json({ message: "Invalid Request" });
             } else {
               //comapring the stored password in the database whether its matching with the password used to login
               const isVerified = await bcrypt.compare(password, result[0].hash);
@@ -30,7 +30,7 @@ const loginMtdUser = (email, password, res) => {
                   location: result[0].location,
                 });
               } else {
-                res.status(400).json({ message: "Wrong User Credentials" });
+                res.status(400).json({ message: "Wrong Credentials" });
               }
             }
           }
