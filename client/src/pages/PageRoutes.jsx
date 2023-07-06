@@ -1,9 +1,19 @@
 import React, { lazy, Suspense, useEffect } from "react";
-import { Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Preloader from "../components/Preloader";
 import TopSlider from "../components/TopSlider";
-import { lazyImportRetry } from "../store/requestMethods";
+import { fetchServices, fetchSPs } from "../redux/apiCalls";
+import { lazyImportRetry } from "../store/lazyDynamicImports";
 import AdminRoutes from "./admin/AdminRoutes";
+import {
+  AdminAuthPagesGuard,
+  AdminPrivateRoutes,
+  SPAuthPagesGuard,
+  SpPrivateRoutes,
+  UserAuthPagesGuard,
+  UserPrivateRoutes,
+} from "./privateRoutes";
 // import SProutes from "./SP/SProutes";
 // import SPLogin from "./SP/SPLogin";
 // import SPRegister from "./SP/SPRegister";
@@ -29,7 +39,13 @@ const P404 = lazy(() => lazyImportRetry(() => import("./Page404")));
 const SProutes = lazy(() => lazyImportRetry(() => import("./SP/SProutes")));
 
 const PageRoutes = () => {
-  // const [IsPending, startTransition] = useTransition();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    fetchServices(dispatch, false);
+    fetchSPs(dispatch, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Routes>
@@ -53,7 +69,7 @@ const PageRoutes = () => {
       <Route
         path="/service/:id"
         element={
-          <>
+          <UserPrivateRoutes>
             <TopSlider />
             <Suspense
               fallback={
@@ -64,13 +80,13 @@ const PageRoutes = () => {
             >
               <SPs />
             </Suspense>
-          </>
+          </UserPrivateRoutes>
         }
       />
       <Route
         path="/services/provider/:id"
         element={
-          <>
+          <UserPrivateRoutes>
             <TopSlider />
             <Suspense
               fallback={
@@ -81,92 +97,104 @@ const PageRoutes = () => {
             >
               <SingleSP />
             </Suspense>
-          </>
+          </UserPrivateRoutes>
         }
       />
       <Route
         path="/auth/cl/login"
         element={
-          <Suspense
-            fallback={
-              <div>
-                <Preloader />
-              </div>
-            }
-          >
-            <Auth type={"user"} />
-          </Suspense>
+          <UserAuthPagesGuard>
+            <Suspense
+              fallback={
+                <div>
+                  <Preloader />
+                </div>
+              }
+            >
+              <Auth type={"user"} />
+            </Suspense>
+          </UserAuthPagesGuard>
         }
       />
       {/* <Route path="/auth/cl/signup" element={<Auth type={"user"} />} /> */}
       <Route
         path="/auth/ad/login"
         element={
-          <Suspense
-            fallback={
-              <div>
-                <Preloader />
-              </div>
-            }
-          >
-            <Auth type={"admin"} />
-          </Suspense>
+          <AdminAuthPagesGuard>
+            <Suspense
+              fallback={
+                <div>
+                  <Preloader />
+                </div>
+              }
+            >
+              <Auth type={"admin"} />
+            </Suspense>
+          </AdminAuthPagesGuard>
         }
       />
       <Route
         path="/admin/dash/*"
         element={
-          <Suspense
-            fallback={
-              <div>
-                <Preloader />
-              </div>
-            }
-          >
-            <AdminRoutes />
-          </Suspense>
+          <AdminPrivateRoutes>
+            <Suspense
+              fallback={
+                <div>
+                  <Preloader />
+                </div>
+              }
+            >
+              <AdminRoutes />
+            </Suspense>
+          </AdminPrivateRoutes>
         }
       />
       <Route
         path="/auth/sp/login"
         element={
-          <Suspense
-            fallback={
-              <div>
-                <Preloader />
-              </div>
-            }
-          >
-            <SPlogin />
-          </Suspense>
+          <SPAuthPagesGuard>
+            <Suspense
+              fallback={
+                <div>
+                  <Preloader />
+                </div>
+              }
+            >
+              <SPlogin />
+            </Suspense>
+          </SPAuthPagesGuard>
         }
       />
       <Route
         path="/SPdash/*"
         element={
-          <Suspense
-            fallback={
-              <div>
-                <Preloader />
-              </div>
-            }
-          >
-            <SProutes />
-          </Suspense>
+          <SpPrivateRoutes>
+            <Suspense
+              fallback={
+                <div>
+                  <Preloader />
+                </div>
+              }
+            >
+              <SProutes />
+            </Suspense>
+          </SpPrivateRoutes>
         }
       />
       <Route
         path="/auth/sp/signup"
         element={
-          <Suspense
-            fallback={
-              <div>
-                <Preloader />
-              </div>
-            }
-          >
-            <SPreister />
-          </Suspense>
+          <SPAuthPagesGuard>
+            <Suspense
+              fallback={
+                <div>
+                  <Preloader />
+                </div>
+              }
+            >
+              <SPreister />
+            </Suspense>
+          </SPAuthPagesGuard>
         }
       />
       {/* <Route path="/auth/sp/signup" element={<Auth  type={"user"}/>} /> */}

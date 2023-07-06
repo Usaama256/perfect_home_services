@@ -41,25 +41,23 @@ const PendingActivations = ({ sps, sx }) => {
               <TableRow>
                 <TableCell>Company Name</TableCell>
                 <TableCell>Contacts</TableCell>
-                <TableCell sortDirection="desc">Submission Data</TableCell>
+                <TableCell sortDirection="desc">Submission Date</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {sps?.map((sp, i) => {
-                const dummyTime = 1680016500900 + Math.pow(i, 20);
-                // const createdAt = format(order.createdAt, "dd/MM/yyyy");
                 return (
                   <TableRow
                     hover
                     key={i}
                     sx={{ cursor: "pointer" }}
-                    onClick={() => navigate(`/admin/dash/sps/${sp.id}`)}
+                    onClick={() => navigate(`/admin/dash/sps/${sp.SPid}`)}
                   >
-                    <TableCell>{sp.title}</TableCell>
+                    <TableCell>{sp.SPname}</TableCell>
                     <TableCell>
                       <Tooltip title="Send Email" arrow>
                         <Chip
-                          label={sp.email[0]}
+                          label={sp.email}
                           color="info"
                           onClick={() => onEmailClient(sp.email)}
                           variant="outlined"
@@ -68,15 +66,15 @@ const PendingActivations = ({ sps, sx }) => {
                       &ensp;
                       <Tooltip title="Call Client" arrow>
                         <Chip
-                          label={sp.tel[0]}
+                          label={sp.contact}
                           color="info"
-                          onClick={() => onCallClient(sp.phone)}
+                          onClick={() => onCallClient(sp.contact)}
                           variant="outlined"
                         />
                       </Tooltip>
                     </TableCell>
                     <TableCell>
-                      {fDateTimeSuffix2(dummyTime)} ({fToNow(dummyTime)})
+                      {fDateTimeSuffix2(sp.updatedAt)} ({fToNow(sp.updatedAt)})
                     </TableCell>
                   </TableRow>
                 );

@@ -6,6 +6,92 @@ import useResponsive from "../../store/hooks/useRsponsive";
 import { imgReg, logo_g } from "../../store/images";
 import { Helmet } from "react-helmet-async";
 import RegStepper from "../../components/sp/register/RegStepper";
+import { useSelector } from "react-redux";
+
+const SPRegister = () => {
+  const { isFetching } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const smUp = useResponsive("up", "sm");
+  const mdUp = useResponsive("up", "md");
+
+  return (
+    <MyContainer>
+      <Helmet>
+        <title>SP Register | Perfect Home Services</title>
+      </Helmet>
+      <RootStyle>
+        <HeaderStyle>
+          {smUp && (
+            <Typography variant="body2" sx={{ mt: { md: -2 }, color: "#fff" }}>
+              Already have an account?&ensp;
+              <Link
+                variant="subtitle2"
+                component={RouterLink}
+                to="/auth/sp/login"
+                sx={{ color: "#242323", fontWeight: 700 }}
+                disabled={isFetching}
+              >
+                Login
+              </Link>
+            </Typography>
+          )}
+        </HeaderStyle>
+
+        {mdUp && (
+          <SectionStyle>
+            <img
+              alt="logo"
+              src={logo_g}
+              style={{
+                width: 200,
+                cursor: "pointer",
+                borderRadius: " 10px",
+                boxShadow: "0px 5px 15px #0000005b",
+              }}
+              onClick={() => isFetching === false && navigate("/")}
+            />
+            <Typography
+              variant="h3"
+              sx={{ px: 5, mt: 10, mb: 5, color: "#fff" }}
+            >
+              Manage Your Business With Us
+            </Typography>
+            <img alt="register" src={imgReg} />
+          </SectionStyle>
+        )}
+
+        <Container>
+          <ContentStyle>
+            <Typography variant="h4" gutterBottom sx={{ color: "#fff" }}>
+              Service Provider Registration
+            </Typography>
+            <Typography sx={{ mb: 5, color: "#fff" }}>
+              Enter You're Business Details
+            </Typography>
+            <RegStepper />
+            {!smUp && (
+              <Typography
+                variant="body2"
+                sx={{ mt: 3, textAlign: "center", color: "#fff" }}
+              >
+                Already have an account?&ensp;
+                <Link
+                  variant="subtitle2"
+                  to="/auth/sp/login"
+                  component={RouterLink}
+                  sx={{ color: "#242323", fontWeight: 700 }}
+                  disabled={isFetching}
+                >
+                  Login
+                </Link>
+              </Typography>
+            )}
+          </ContentStyle>
+        </Container>
+      </RootStyle>
+    </MyContainer>
+  );
+};
 
 const RootStyle = styled("div")(({ theme }) => ({
   [theme.breakpoints.up("md")]: {
@@ -56,120 +142,5 @@ const MyContainer = styled("div")(() => ({
   minHeight: "100vh",
   background: "linear-gradient(to right, #aa0000, #f82828)",
 }));
-
-const SPRegister = () => {
-  const navigate = useNavigate();
-  const smUp = useResponsive("up", "sm");
-
-  const mdUp = useResponsive("up", "md");
-
-  return (
-    <MyContainer>
-      <Helmet>
-        <title>SP Register | Perfect Home Services</title>
-      </Helmet>
-      <RootStyle>
-        <HeaderStyle>
-          {smUp && (
-            <Typography variant="body2" sx={{ mt: { md: -2 }, color: "#fff" }}>
-              Already have an account?
-              <Link
-                variant="subtitle2"
-                component={RouterLink}
-                to="/auth/sp/login"
-                sx={{ color: "#242323", fontWeight: 700 }}
-              >
-                Login
-              </Link>
-            </Typography>
-          )}
-        </HeaderStyle>
-
-        {mdUp && (
-          <SectionStyle>
-            <img
-              alt="logo"
-              src={logo_g}
-              style={{
-                width: 200,
-                cursor: "pointer",
-                borderRadius: " 10px",
-                boxShadow: "0px 5px 15px #0000005b",
-              }}
-              onClick={() => navigate("/")}
-            />
-            <Typography
-              variant="h3"
-              sx={{ px: 5, mt: 10, mb: 5, color: "#fff" }}
-            >
-              Manage Your Business With Us
-            </Typography>
-            <img alt="register" src={imgReg} />
-          </SectionStyle>
-        )}
-
-        <Container>
-          <ContentStyle>
-            <Typography variant="h4" gutterBottom sx={{ color: "#fff" }}>
-              Service Provider Registration
-            </Typography>
-
-            {/* <Typography sx={{ mb: 5, color: "#fff" }}>
-              Do More With Perfect Home Services
-            </Typography> */}
-            <Typography sx={{ mb: 5, color: "#fff" }}>
-              Enter You're Business Details
-            </Typography>
-            <RegStepper />
-            {/* <AuthSocial /> */}
-
-            {/* <RegisterForm /> */}
-
-            {/* <Typography
-              variant="body2"
-              align="center"
-              sx={{ mt: 3, color: "#fff" }}
-            >
-              By registering, I agree to Perfect Home Services&nbsp;
-              <Link
-                underline="always"
-                sx={{ color: "#52aefe" }}
-                href={() => false}
-              >
-                Terms of Service
-              </Link>
-              &nbsp;and&nbsp;
-              <Link
-                underline="always"
-                sx={{ color: "#52aefe" }}
-                href={() => false}
-              >
-                Privacy Policy
-              </Link>
-              .
-            </Typography> */}
-
-            {!smUp && (
-              <Typography
-                variant="body2"
-                sx={{ mt: 3, textAlign: "center", color: "#fff" }}
-              >
-                Already have an account?
-                <Link
-                  variant="subtitle2"
-                  to="/auth/sp/login"
-                  component={RouterLink}
-                  sx={{ color: "#242323", fontWeight: 700 }}
-                >
-                  Login
-                </Link>
-              </Typography>
-            )}
-          </ContentStyle>
-        </Container>
-      </RootStyle>
-    </MyContainer>
-  );
-};
 
 export default SPRegister;

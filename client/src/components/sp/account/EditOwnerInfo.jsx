@@ -12,11 +12,37 @@ import {
   Unstable_Grid2 as Grid,
 } from "@mui/material";
 import { CameraAlt, Close, SaveAs } from "@mui/icons-material";
-import { ownerSample } from "../../../store/dummies";
 import styled from "styled-components";
+import { useState } from "react";
+import { useEffect } from "react";
+import { useSnackbar } from "notistack";
 
-const EditOwnerInfo = ({ closeEditor }) => {
-  const SpOwner = ownerSample;
+const EditOwnerInfo = ({ closeEditor, sp }) => {
+  const { owner } = sp;
+  const { enqueueSnackbar } = useSnackbar();
+  const [middleman, setMiddleman] = useState({
+    position: "",
+    firstName: "",
+    lastName: "",
+    location: "",
+    email: "",
+    tel: "",
+    desc: "",
+    avator: "",
+  });
+
+  useEffect(() => {
+    setMiddleman({
+      position: owner.position,
+      firstName: owner.firstName,
+      lastName: owner.lastName,
+      location: owner.location,
+      email: owner.email,
+      tel: owner.tel,
+      desc: owner.desc,
+      avator: owner.avator,
+    });
+  }, [owner]);
 
   //Image change handler
   const editAvatorHandler = (e) => {
@@ -26,7 +52,18 @@ const EditOwnerInfo = ({ closeEditor }) => {
     e.target.value = null;
   };
 
-  const resetFields = () => {};
+  const resetFields = () => {
+    setMiddleman({
+      position: owner.position,
+      firstName: owner.firstName,
+      lastName: owner.lastName,
+      location: owner.location,
+      email: owner.email,
+      tel: owner.tel,
+      desc: owner.desc,
+      avator: owner.avator,
+    });
+  };
 
   const closeHandler = () => {
     resetFields();
@@ -77,7 +114,7 @@ const EditOwnerInfo = ({ closeEditor }) => {
                     }}
                   >
                     <img
-                      src={SpOwner.avator}
+                      src={middleman.avator && middleman.avator}
                       alt="logo"
                       style={{
                         width: "100%",
@@ -100,18 +137,28 @@ const EditOwnerInfo = ({ closeEditor }) => {
                 <TextField
                   fullWidth
                   label="First Name"
-                  // onChange={() => {}}
                   required
-                  // value={SP.title}
+                  value={middleman.firstName}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      firstName: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={3}>
                 <TextField
                   fullWidth
                   label="Last Name"
-                  // onChange={() => {}}
                   required
-                  // value={SP.title}
+                  value={middleman.lastName}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      lastName: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -119,9 +166,14 @@ const EditOwnerInfo = ({ closeEditor }) => {
                   fullWidth
                   label="Location"
                   name="location"
-                  // onChange={() => {}}
                   required
-                  // value={SP.location}
+                  value={middleman.location}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      location: e.target.value,
+                    })
+                  }
                 />
               </Grid>
             </Grid>
@@ -131,18 +183,28 @@ const EditOwnerInfo = ({ closeEditor }) => {
                 <TextField
                   fullWidth
                   label="Email Address"
-                  // onChange={() => {}}
                   required
-                  // value={SP.email[0]}
+                  value={middleman.email}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      email: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Phone Number"
-                  // onChange={() => {}}
                   required
-                  // value={SP.tel[0]}
+                  value={middleman.tel}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      tel: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -152,9 +214,14 @@ const EditOwnerInfo = ({ closeEditor }) => {
                   helperText="Not More than 200 words"
                   multiline
                   rows={10}
-                  // onChange={() => {}}
                   required
-                  // value={SP.desc}
+                  value={middleman.desc}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      desc: e.target.value,
+                    })
+                  }
                 />
               </Grid>
             </Grid>
@@ -175,7 +242,11 @@ const EditOwnerInfo = ({ closeEditor }) => {
         >
           Close Editor
         </Button>
-        <Button variant="outlined" color="secondary">
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => resetFields()}
+        >
           Reset Fields
         </Button>
         <Button
@@ -185,6 +256,9 @@ const EditOwnerInfo = ({ closeEditor }) => {
             <SvgIcon size="small">
               <SaveAs />
             </SvgIcon>
+          }
+          onClick={() =>
+            enqueueSnackbar("Our Team Is Working On It", { variant: "info" })
           }
         >
           Save details

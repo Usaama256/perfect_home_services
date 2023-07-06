@@ -14,8 +14,78 @@ import LanguagePopover from "./LanguagePopover";
 import NotificationsPopover from "./NotificationsPopover";
 import { Home, Menu } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { useState } from "react";
+import LogoutConfirmDialog from "../LogoutConfirmDialog";
 
 // ----------------------------------------------------------------------
+
+const DashboardNavbar = ({ onOpenSidebar }) => {
+  const { user } = useSelector((state) => state.user);
+  const navigate = useNavigate();
+  const [openLogout, setOpenLogout] = useState(false);
+
+  return (
+    <RootStyle>
+      {openLogout && (
+        <LogoutConfirmDialog open={openLogout} setOpen={setOpenLogout} />
+      )}
+      <ToolbarStyle>
+        <IconButton
+          onClick={onOpenSidebar}
+          sx={{
+            mr: 1,
+            color: "text.primary",
+            display: { lg: "none" },
+          }}
+        >
+          <Menu />
+        </IconButton>
+        <Stack
+          direction="column"
+          alignItems="flex-start"
+          justifyContent="center"
+          gap="3px"
+        >
+          <Typography color="text.primary" variant="h5">
+            Service Provider Section
+          </Typography>
+          <Typography color="text.primary" variant="h4">
+            {user.title}
+          </Typography>
+        </Stack>
+
+        <Box sx={{ flexGrow: 1 }} />
+
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={{ xs: 0.5, sm: 1.5 }}
+        >
+          <Tooltip title="Landing Page" arrow>
+            <IconButton
+              onClick={() => navigate("/")}
+              sx={{
+                padding: 0,
+                width: 44,
+                height: 44,
+              }}
+            >
+              <Home />
+            </IconButton>
+          </Tooltip>
+          <LanguagePopover />
+          <NotificationsPopover />
+          <AccountPopover user={user} openLogout={() => setOpenLogout(true)} />
+        </Stack>
+      </ToolbarStyle>
+    </RootStyle>
+  );
+};
+
+DashboardNavbar.propTypes = {
+  onOpenSidebar: PropTypes.func,
+};
 
 const DRAWER_WIDTH = 280;
 const APPBAR_MOBILE = 64;
@@ -39,57 +109,4 @@ const ToolbarStyle = styled(Toolbar)(({ theme }) => ({
   },
 }));
 
-// ----------------------------------------------------------------------
-
-const DashboardNavbar = ({ onOpenSidebar }) => {
-  const navigate = useNavigate();
-
-  return (
-    <RootStyle>
-      <ToolbarStyle>
-        <IconButton
-          onClick={onOpenSidebar}
-          sx={{
-            mr: 1,
-            color: "text.primary",
-            display: { lg: "none" },
-          }}
-        >
-          <Menu />
-        </IconButton>
-
-        <Typography color="text.primary" variant="h4">
-          Service Provider Section
-        </Typography>
-        <Box sx={{ flexGrow: 1 }} />
-
-        <Stack
-          direction="row"
-          alignItems="center"
-          spacing={{ xs: 0.5, sm: 1.5 }}
-        >
-          <Tooltip title="Landing Page" arrow>
-            <IconButton
-              onClick={() => navigate("/")}
-              sx={{
-                padding: 0,
-                width: 44,
-                height: 44,
-              }}
-            >
-              <Home />
-            </IconButton>
-          </Tooltip>
-          <LanguagePopover />
-          <NotificationsPopover />
-          <AccountPopover />
-        </Stack>
-      </ToolbarStyle>
-    </RootStyle>
-  );
-};
-
-DashboardNavbar.propTypes = {
-  onOpenSidebar: PropTypes.func,
-};
 export default DashboardNavbar;

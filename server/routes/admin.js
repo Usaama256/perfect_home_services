@@ -2,34 +2,37 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db/db_man");
 const bcrypt = require("bcryptjs");
-const { verify_email, loginMtdAdmin } = require("./methods");
+const {
+  verify_email,
+  loginMtdAdmin,
+  fetchSP,
+  fetchSPpdts,
+  uploadImage,
+} = require("./methods");
 
-//API for registering the admin
+//API for registering the  \/
 router.post("/register", async (req, res) => {
-  const { FirstName, SecondName, email, username, password, phone, location } =
-    req.body;
+  const { firstName, lastName, email, pass, phone, location } = req.body;
   if (
-    FirstName == null ||
-    FirstName == "" ||
-    SecondName == null ||
-    SecondName == "" ||
+    firstName == null ||
+    firstName == "" ||
+    lastName == null ||
+    lastName == "" ||
     email == null ||
     email == "" ||
-    username == null ||
+    phone == null ||
     phone == "" ||
     location == null ||
-    phone == ""
+    location == ""
   ) {
     res.status(400).json({ message: "Bad Request" });
   } else {
-    //checking whether the email syntax is correct
     if (verify_email(email)) {
       //encrypting the password into string of and numbers using hash method,
-      const hash = await bcrypt.hash(password, 10);
+      const hash = await bcrypt.hash(pass, 10);
       const new_admin = {
-        FirstName,
-        SecondName,
-        username,
+        firstName,
+        lastName,
         email,
         phone,
         location,
@@ -39,120 +42,291 @@ router.post("/register", async (req, res) => {
         if (err) {
           console.log(err);
           if (err.errno == 1062) {
-            res.status(400).json({ message: "Admin already registerd" });
+            res.status(400).json("Admin already registerd");
           } else {
-            res.status(400).json({ message: "Bad request" });
+            res.status(400).json("Bad request");
           }
         } else {
-          res.status(200).json({ message: " Registerd Successfully" });
+          res.status(200).json("Registerd Successfully");
         }
       });
     } else {
-      res.status(400).json({ message: "Bad Request" });
+      res.status(400).json("Bad Request");
     }
   }
 });
 
-//API to sign in the admin
+//API to sign in the admin \/
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  loginMtdAdmin(email, password, res);
+  const { email, pass } = req.body;
+  loginMtdAdmin(email, pass, res);
 });
 
-//API for admin to view all users
-router.get("/viewUsers", async (req, res) => {
+//API for admin to view all users \/
+router.get("/fetchUsers", async (req, res) => {
   db.query("select * from Users", (err, result) => {
     if (err) {
       console.log(err);
       res.status(500).json("Something went wrong");
     } else {
-      res.status(200).json(result);
-    }
-  });
-});
-
-//API for admin to view all service providers
-router.get("/viewSPs", async (req, res) => {
-  db.query("select * from ServiceProvider", (err, result) => {
-    if (err) {
-      console.log(err);
-      res.status(500).json("Something went wrong");
-    } else {
-      res.status(200).json(result);
-    }
-  });
-});
-
-//API for adding service by the admin
-router.post("/addService", async (req, res) => {
-  try {
-    const { Sname, Sdescription, images } = req.body;
-
-    if (
-      Sname == "" ||
-      Sname == null ||
-      Sdescription == "" ||
-      Sdescription == null ||
-      images == "" ||
-      images == null
-    ) {
-      res.status(404).json("Bad Request");
-    } else {
-      const new_service = {
-        Sname,
-        Sdescription,
-        images,
-      };
-      db.query("insert into Services set ?", new_service, (err) => {
-        if (err) {
-          console.log(err);
-          if (err.errno == 1062) {
-            res.status(400).json("Service Exists");
-          } else {
-            res.status(400).json("Bad request");
-          }
-        } else {
-          res.status(200).json("Service Added");
-        }
+      const filtered = result.map((i, n) => {
+        const { hash, ...rest } = i;
+        return rest;
       });
+      res.status(200).json(filtered);
     }
-  } catch (error) {
-    console.log(error);
-    res.json("Something Didn't go right");
+  });
+});
+
+//API for admin to view all service providers \/
+router.get("/fetchSPs", async (req, res) => {
+  db.query(
+    "select SPid, SPname, email, contact, location, logoImg, description, status, approved, rateValue, reviewsNo, ServiceProviders.createdAt, ServiceProviders.updatedAt, Sid, Sname from ServiceProviders join Services using (Sid) join Ratings using (SPid) order by SPid desc",
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json("Something went wrong");
+      } else {
+        res.status(200).json(result);
+      }
+    }
+  );
+});
+
+//API for admin to single service provider \/
+router.get("/fetchSP/:SPid", async (req, res) => {
+  const SPid = parseInt(req.params.SPid, 10);
+  fetchSP(SPid, res);
+});
+
+//Fetching single SP products \/
+router.get("/getPdts/:SPid", async (req, res) => {
+  const SPid = parseInt(req.params.SPid, 10);
+  if (req.params.SPid.length <= 0) {
+    return res.status(400).json("Bad Request");
+  } else {
+    fetchSPpdts(SPid, res);
   }
 });
 
-//API for editing a service by the admin
-router.put("/editService/:id", async (req, res) => {
+//Fetching single SP reviews \/
+router.get("/fetchComments/:SPid", async (req, res) => {
   try {
-    const Sid = req.params.id;
-    const images = req.body.images;
+    const SPid = parseInt(req.params.SPid, 10);
+    db.query(
+      `select Uid, comment, username, email, phone, profilePic, status, SpUserComments.createdAt from SpUserComments join Users using (Uid) where SPid='${SPid}' order by Cid desc;`,
+      (err, results) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json("Something Went wrong");
+        } else {
+          res.status(200).json(results);
+        }
+      }
+    );
+  } catch (error) {
+    console.log(error);
+  }
+});
 
-    if (Sid == "" || Sid == null || images == "" || images == null) {
-      res.status(401).json("Bad request");
+//Fetching all services \/
+router.get("/getservices", async (req, res) => {
+  try {
+    db.query("select * from Services", (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json("Something Went Wrong");
+      } else {
+        const filtered = result.map((i, n) => {
+          return { ...i, imgs: JSON.parse(i.imgs) };
+        });
+        res.status(200).json(filtered);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("Something Didn't go right");
+  }
+});
+
+//API for adding service by the admin \/
+router.post("/addService", async (req, res) => {
+  try {
+    const { Sname, desc, imgsArr } = req.body;
+
+    if (Sname == "" || Sname == null) {
+      res.status(404).json("Bad Request");
     } else {
-      db.query(`select * from Services where Sid =${Sid}`, (err, result) => {
+      if (imgsArr.length > 1) {
+        const images = [];
+        var blankNum = 0;
+        imgsArr.forEach((i, n) => {
+          const fName = `${Sname.replace(/ /g, "-")}_${n + 1}`;
+          uploadImage(i, fName, "services").then((name) => {
+            if (i?.length > 20) {
+              images.push({
+                title: "",
+                src: `http://localhost:5427/images/services/${name}`,
+                desc: "",
+              });
+              console.log("Service image Uploaded");
+            } else {
+              blankNum += 1;
+            }
+            if (images.length + blankNum == imgsArr.length) {
+              const imgs = JSON.stringify(images);
+              const newService = {
+                Sname,
+                desc,
+                imgs,
+              };
+              db.query("insert into Services set?", newService, (err) => {
+                if (err) {
+                  console.log(err);
+                  if (err.errno == 1062) {
+                    res.status(400).json("Service Exists");
+                  } else {
+                    res.status(400).json("Bad request");
+                  }
+                } else {
+                  db.query("select * from Services", (err, result) => {
+                    if (err) {
+                      console.log(err);
+                      res.status(500).json("Something Went Wrong");
+                    } else {
+                      const filtered = result.map((i, n) => {
+                        return { ...i, imgs: JSON.parse(i.imgs) };
+                      });
+                      res.status(200).json(filtered);
+                    }
+                  });
+                }
+              });
+            }
+          });
+        });
+      } else {
+        const newService = {
+          Sname,
+          desc,
+          // imgs: imgArr,
+        };
+        db.query("insert into Services set?", newService, (err) => {
+          if (err) {
+            console.log(err);
+            if (err.errno == 1062) {
+              res.status(400).json("Service Exists");
+            } else {
+              res.status(400).json("Bad request");
+            }
+          } else {
+            db.query("select * from Services", (err, result) => {
+              if (err) {
+                console.log(err);
+                res.status(500).json("Something Went Wrong");
+              } else {
+                const filtered = result.map((i, n) => {
+                  return { ...i, imgs: JSON.parse(i.imgs) };
+                });
+                res.status(200).json(filtered);
+              }
+            });
+          }
+        });
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("Something Didn't go right");
+  }
+});
+
+//Enabling a service \/
+router.get("/enableService/:Sid", async (req, res) => {
+  try {
+    const Sid = parseInt(req.params.Sid, 10);
+    db.query(`update Services set active='1' where Sid='${Sid}'`, (err) => {
+      if (err) {
+        console.log(err);
+        res.status(400).json("Failed");
+      } else {
+        db.query("select * from Services", (err, result) => {
+          if (err) {
+            console.log(err);
+            res.status(500).json("Something Went Wrong");
+          } else {
+            const filtered = result.map((i, n) => {
+              return { ...i, imgs: JSON.parse(i.imgs) };
+            });
+            res.status(200).json(filtered);
+          }
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json('"Something went wrong"');
+  }
+});
+
+//Disabling a service \/
+router.get("/disableService/:Sid", async (req, res) => {
+  try {
+    const Sid = parseInt(req.params.Sid, 10);
+    db.query(`update Services set active='0' where Sid='${Sid}'`, (err) => {
+      if (err) {
+        console.log(err);
+        res.status(400).json("Failed");
+      } else {
+        db.query("select * from Services", (err, result) => {
+          if (err) {
+            console.log(err);
+            res.status(500).json("Something Went Wrong");
+          } else {
+            const filtered = result.map((i, n) => {
+              return { ...i, imgs: JSON.parse(i.imgs) };
+            });
+            res.status(200).json(filtered);
+          }
+        });
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json('"Something went wrong"');
+  }
+});
+
+//API for editing a service by the admin \/
+router.post("/editService/:Sid", async (req, res) => {
+  try {
+    const Sid = parseInt(req.params.Sid, 10);
+    const { name, desc } = req.body;
+
+    if (name == "" || name == null) {
+      res.status(404).json("Bad Request");
+    } else {
+      const newService = {
+        name,
+        desc,
+        // imgs: imgArr,
+      };
+      db.query(`update Services set? where Sid='${Sid}'`, newService, (err) => {
         if (err) {
           console.log(err);
           res.status(500).json("Something Went Wrong");
         } else {
-          //checking if the result exists in the database
-          if (result < 1) {
-            res.status(400).json("Invalid Request");
-          } else {
-            db.query(
-              "update Services set images=? where Sid = ?",
-              [images, Sid],
-              (err) => {
-                if (err) {
-                  console.log(err);
-                  res.status(400).json("Update Failed");
-                } else {
-                  res.status(200).json("Order updated");
-                }
-              }
-            );
-          }
+          db.query("select * from Services", (err, result) => {
+            if (err) {
+              console.log(err);
+              res.status(500).json("Something Went Wrong");
+            } else {
+              const filtered = result.map((i, n) => {
+                return { ...i, imgs: JSON.parse(i.imgs) };
+              });
+              res.status(200).json(filtered);
+            }
+          });
         }
       });
     }
@@ -162,22 +336,72 @@ router.put("/editService/:id", async (req, res) => {
   }
 });
 
-//API for viewing details of a single service provider by the admin
-router.get("/viewSP/:id", async (req, res) => {
-  const SPid = req.params.id;
+//Update Service Images \/
+router.post("/editServiceImgs/:Sid", async (req, res) => {
+  try {
+    const Sid = parseInt(req.params.Sid, 10);
+    const { name, imgsArr } = req.body;
+
+    if (imgsArr.length > 1) {
+      const images = [];
+      imgsArr.forEach((i, n) => {
+        const fName = `${name.replace(/ /g, "-")}_${n + 1}`;
+        uploadImage(i, fName, "services").then((name) => {
+          images.push(`http://localhost:5427/images/services/${name}`);
+          console.log("Service image Uploaded");
+          if (images.length == imgsArr.length) {
+            const imgs = JSON.stringify(images);
+            db.query(
+              `update Services set imgs='${imgs}' where Sid='${Sid}'`,
+              (err) => {
+                if (err) {
+                  console.log(err);
+                  res.status(500).json("Bad request");
+                } else {
+                  db.query("select * from Services", (err, result) => {
+                    if (err) {
+                      console.log(err);
+                      res.status(500).json("Something Went Wrong");
+                    } else {
+                      const filtered = result.map((i, n) => {
+                        return { ...i, imgs: JSON.parse(i.imgs) };
+                      });
+                      res.status(200).json(filtered);
+                    }
+                  });
+                }
+              }
+            );
+          }
+        });
+      });
+    } else {
+      res.status(400).json("No images to update");
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json("Something went wrong");
+  }
+});
+
+//API for enabling a service provider by the admin \/
+//Allows SPs to log into their accounts
+router.get("/approveSP/:SPid", async (req, res) => {
+  const SPid = parseInt(req.params.SPid, 10);
   if (SPid == null || SPid == "") {
-    res.status(400).json("Bad Request");
+    return res.status(400).json("Bad request");
   } else {
     db.query(
-      `select SPname,email,contact,SPtype,SPdescription,location from ServiceProvider where SPid=${SPid}`,
+      `update ServiceProviders set approved='1' where SPid='${SPid}'`,
       (err, result) => {
         if (err) {
           console.log(err);
+          res.status(500).json("Something Went wrong");
         } else {
-          if (result < 1) {
-            res.status(401).json({ message: "Invalid Request" });
+          if (result.affectedRows == 0) {
+            res.status(400).json("Service Provider Doesnt exist");
           } else {
-            res.status(200).json(result);
+            fetchSP(SPid, res);
           }
         }
       }
@@ -185,25 +409,24 @@ router.get("/viewSP/:id", async (req, res) => {
   }
 });
 
-//API for aproving the service provider by the admin
-router.put("/approveSP/:id", async (req, res) => {
-  const Spid = req.params.id;
-  if (Spid == null || Spid == "") {
-    res.status(400).json("Bad request");
+//API for disabling a service provider by the admin \/
+//Stops an SP from logging into their account
+router.get("/disapproveSP/:SPid", async (req, res) => {
+  const SPid = parseInt(req.params.SPid, 10);
+  if (SPid == null || SPid == "") {
+    return res.status(400).json("Bad request");
   } else {
     db.query(
-      `update ServiceProvider set Approve =1 where SPid=${Spid}`,
+      `update ServiceProviders set approved='0' where SPid='${SPid}'`,
       (err, result) => {
         if (err) {
           console.log(err);
           res.status(500).json("Something Went wrong");
         } else {
-          //check if the service provider exists
           if (result.affectedRows == 0) {
             res.status(400).json("Service Provider Doesnt exist");
           } else {
-            // console.log(result);
-            res.status(200).json("Service Provider Approved");
+            fetchSP(SPid, res);
           }
         }
       }
@@ -211,30 +434,101 @@ router.put("/approveSP/:id", async (req, res) => {
   }
 });
 
-//API to disapprove the service provider by the admin
-router.put("/diapproveSP/:id", async (req, res) => {
-  const Spid = req.params.id;
-  if (Spid == null || Spid == "") {
-    res.status(400).json("Bad request");
+//API for activating a service provider by the admin \/
+//Allows SPs to start interracting with users
+router.get("/activateSP/:SPid", async (req, res) => {
+  const SPid = parseInt(req.params.SPid, 10);
+  if (SPid == null || SPid == "") {
+    return res.status(400).json("Bad request");
   } else {
     db.query(
-      `update ServiceProvider set Approve =0 where SPid=${Spid}`,
+      `update ServiceProviders set status='active' where SPid='${SPid}'`,
       (err, result) => {
         if (err) {
           console.log(err);
           res.status(500).json("Something Went wrong");
         } else {
-          //check if the service provider exists
           if (result.affectedRows == 0) {
             res.status(400).json("Service Provider Doesnt exist");
           } else {
-            // console.log(result);
-            res.status(200).json("Service Provider Disapproved");
+            fetchSP(SPid, res);
           }
         }
       }
     );
   }
 });
+
+//API for suspend a service provider by the admin \/
+//Stops SPs from interracting with clients but can log in
+router.get("/suspendSP/:SPid", async (req, res) => {
+  const SPid = parseInt(req.params.SPid, 10);
+  if (SPid == null || SPid == "") {
+    return res.status(400).json("Bad request");
+  } else {
+    db.query(
+      `update ServiceProviders set status='suspended' where SPid='${SPid}'`,
+      (err, result) => {
+        if (err) {
+          console.log(err);
+          res.status(500).json("Something Went wrong");
+        } else {
+          if (result.affectedRows == 0) {
+            res.status(400).json("Service Provider Doesnt exist");
+          } else {
+            fetchSP(SPid, res);
+          }
+        }
+      }
+    );
+  }
+});
+
+//Admin Fetch totals
+router.get("/gettotals", (req, res) => {
+  db.query(
+    "select count(SPid) as count from ServiceProviders union all select count(Uid) from Users",
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json("Something Went Wrong");
+      } else {
+        res.status(200).json({
+          SPs: parseInt(result[0].count, 10),
+          users: parseInt(result[1].count, 10),
+        });
+      }
+    }
+  );
+});
+
+// //API for deleting the service
+// router.delete("/delService/:id", async (req, res) => {
+//   //service id got from the user side
+//   const Sid = req.params.id;
+//   if (Sid == null || Sid == "") {
+//     res.status(400).json("Bad Request");
+//   } else {
+//     db.query(`select * from Services where Sid="${Sid}"`, (err, result) => {
+//       if (err) {
+//         console.log(err);
+//         res.status(500).json({ message: "Something Went Wrong" });
+//       } else {
+//         if (result.length <= 0) {
+//           res.status(400).json({ Message: "Invalid request" });
+//         } else {
+//           db.query(`delete from Services where Sid="${Sid}"`, (error) => {
+//             if (error) {
+//               console.log(error);
+//               res.status(500).json("Something went wrong");
+//             } else {
+//               res.status(200).json({ Message: "Service Deleted" });
+//             }
+//           });
+//         }
+//       }
+//     });
+//   }
+// });
 
 module.exports = router;

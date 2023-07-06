@@ -8,8 +8,11 @@ import ScrollToTop from "./ScrollToTop";
 // import "simplebar/dist/simplebar.css";
 
 const GenLayout = ({ children, title, nav }) => {
+  const scrollTest = (e) => {
+    console.log(e);
+  };
   return (
-    <Container>
+    <Container onScroll={scrollTest}>
       <Helmet>
         <title>
           {title ? `${title} | Perfect Home Services` : "Perfect Home Services"}

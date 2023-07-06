@@ -1,17 +1,24 @@
 import React from "react";
 import ServiceCard from "./ServiceCard";
 import styled from "styled-components";
-import { servicesArr } from "../store/services";
+import { LoadingPlaceholder2 } from "./LoadingPlaceholder";
 
-const ServicesDisplay = () => {
+const ServicesDisplay = ({ servicesArr }) => {
   return (
     <Container id="products">
       <h1 className="title">Where Quality Meets Comfort</h1>
       <div className="desc">We care for your home like it's our own</div>
       <div className="wrapper">
-        {servicesArr?.map((item, index) => {
-          return <ServiceCard {...item} key={index} />;
-        })}
+        {servicesArr ? (
+          servicesArr?.map((item, index) => {
+            return <ServiceCard {...item} key={index} />;
+          })
+        ) : (
+          <>
+            <LoadingPlaceholder2 />
+            <LoadingPlaceholder2 />
+          </>
+        )}
       </div>
     </Container>
   );

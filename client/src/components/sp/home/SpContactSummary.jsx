@@ -1,12 +1,10 @@
 import PropTypes from "prop-types";
 import {
   Box,
-  Button,
   Card,
   CardActions,
   CardHeader,
   Divider,
-  SvgIcon,
   Table,
   TableBody,
   TableCell,
@@ -16,22 +14,25 @@ import {
 } from "@mui/material";
 import Chip from "@mui/material/Chip";
 import Scrollbar from "../../Scrollbar";
-import { ArrowForwardIos } from "@mui/icons-material";
 import { fDateTimeSuffix2, fToNow } from "../../../store/formatTime";
-import { imgAvator } from "../../../store/images";
+import BackgroundLetterAvatars from "../../BackgroundLetterAvatars";
+import { Phone } from "@mui/icons-material";
 
-const SpContactSummary = ({ users, sx }) => {
+const SpContactSummary = ({ calls, userActive, sx }) => {
   const onCallClient = (tel) => {
-    window.open(`tel:${tel}`);
+    userActive && window.open(`tel:${tel}`);
   };
 
   const onEmailClient = (email) => {
-    window.open(`mailto:${email}`);
+    userActive && window.open(`mailto:${email}`);
   };
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Contact Summary" />
+      <CardHeader
+        title="User Call Requests"
+        subheader="Please Contact these clients"
+      />
       <br />
       <Scrollbar sx={{ flexGrow: 1 }}>
         <Box sx={{ minWidth: 800 }}>
@@ -47,49 +48,49 @@ const SpContactSummary = ({ users, sx }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {users?.map((usr, i) => {
+              {calls?.map((call, i) => {
                 // const createdAt = format(order.createdAt, "dd/MM/yyyy");
                 return (
                   <TableRow hover key={i}>
                     <TableCell>
-                      <Box
-                        component="img"
-                        alt="img"
-                        src={imgAvator}
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: 1.5,
-                          flexShrink: 0,
-                        }}
-                      />
+                      <BackgroundLetterAvatars name={call.username} />
                     </TableCell>
-                    <TableCell>{usr.name}</TableCell>
+                    <TableCell>{call.username}</TableCell>
                     <TableCell>
                       <Tooltip title="Send Email" arrow>
                         <Chip
-                          label={usr.email}
+                          label={call.email}
                           color="info"
-                          onClick={() => onEmailClient(usr.email)}
-                          variant={usr.type === "email" ? "filled" : "outlined"}
+                          onClick={() => onEmailClient(call.email)}
+                          variant={
+                            call.type === "email" ? "filled" : "outlined"
+                          }
                         />
                       </Tooltip>
                     </TableCell>
                     <TableCell>
                       <Tooltip title="Call Client" arrow>
                         <Chip
-                          label={usr.phone}
+                          label={call.phone}
                           color="info"
-                          onClick={() => onCallClient(usr.phone)}
-                          variant={usr.type === "phone" ? "filled" : "outlined"}
+                          onClick={() => onCallClient(call.phone)}
+                          variant={call.type === "tel" ? "filled" : "outlined"}
                         />
                       </Tooltip>
                     </TableCell>
                     <TableCell>
-                      {fDateTimeSuffix2(usr.createdAt)} ({fToNow(usr.createdAt)}
-                      )
+                      {fDateTimeSuffix2(call.time)} ({fToNow(call.time)})
                     </TableCell>
-                    <TableCell>{usr.type}</TableCell>
+                    <TableCell
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-start",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Phone />
+                      &ensp; Phone
+                    </TableCell>
                   </TableRow>
                 );
               })}
@@ -99,7 +100,7 @@ const SpContactSummary = ({ users, sx }) => {
       </Scrollbar>
       <Divider />
       <CardActions sx={{ justifyContent: "flex-end" }}>
-        <Button
+        {/* <Button
           color="inherit"
           endIcon={
             <SvgIcon fontSize="small">
@@ -110,7 +111,7 @@ const SpContactSummary = ({ users, sx }) => {
           variant="text"
         >
           View all
-        </Button>
+        </Button> */}
       </CardActions>
     </Card>
   );

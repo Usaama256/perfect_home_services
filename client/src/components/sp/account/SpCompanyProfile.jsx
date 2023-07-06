@@ -10,25 +10,20 @@ import {
   Typography,
 } from "@mui/material";
 import { EditNote } from "@mui/icons-material";
-import { dummySPs } from "../../../store/dummies";
-import { servicesArr } from "../../../store/services";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
-const SpCompanyProfile = ({ editCompany }) => {
-  const SP = dummySPs[0];
+const SpCompanyProfile = ({ editCompany, sp }) => {
+  const { services } = useSelector((state) => state.services);
   const [category, setCategory] = useState(null);
 
   useEffect(() => {
-    setCategory(servicesArr.filter((i) => i.id === SP.sId)[0]);
+    setCategory(services.filter((i) => i.id === sp.Sid)[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <Card
-      sx={{
-        color: (theme) => theme.palette["primary"].darker,
-        bgcolor: (theme) => theme.palette["primary"].lighter,
-      }}
-    >
+    <Card>
       <CardContent>
         <Box
           sx={{
@@ -55,7 +50,7 @@ const SpCompanyProfile = ({ editCompany }) => {
             }}
           >
             <img
-              src={SP.logo}
+              src={sp.logo && sp.logo}
               alt="logo"
               style={{
                 width: "100%",
@@ -65,7 +60,7 @@ const SpCompanyProfile = ({ editCompany }) => {
             />
           </div>
           <Typography gutterBottom variant="h5">
-            {SP.title}
+            {sp.title}
           </Typography>
 
           <Stack
@@ -88,7 +83,7 @@ const SpCompanyProfile = ({ editCompany }) => {
               sx={{ margin: "0px !important" }}
             >
               <Typography color="text.secondary" variant="body1">
-                {SP.location}
+                {sp.location}
               </Typography>
             </Stack>
           </Stack>
@@ -105,14 +100,14 @@ const SpCompanyProfile = ({ editCompany }) => {
               variant="h6"
               sx={{ margin: "0px" }}
             >
-              Email Address(es)
+              Email Address
             </Typography>
             <Stack
               direction="row"
               spacing={2}
               sx={{ margin: "0px !important" }}
             >
-              {SP.email?.map((i, n) => (
+              {[sp.email].map((i, n) => (
                 <Typography color="text.secondary" variant="body1" key={n}>
                   {i}
                 </Typography>
@@ -132,14 +127,14 @@ const SpCompanyProfile = ({ editCompany }) => {
               variant="h6"
               sx={{ margin: "0px" }}
             >
-              Telephone Contact(s)
+              Telephone Contact
             </Typography>
             <Stack
               direction="row"
               spacing={2}
               sx={{ margin: "0px !important" }}
             >
-              {SP.tel?.map((i, n) => (
+              {[sp.tel].map((i, n) => (
                 <Typography color="text.secondary" variant="body1" key={n}>
                   {i}
                 </Typography>
@@ -166,7 +161,7 @@ const SpCompanyProfile = ({ editCompany }) => {
               variant="body1"
               sx={{ margin: "0px !important" }}
             >
-              {SP.desc}
+              {sp.desc}
             </Typography>
           </Stack>
 

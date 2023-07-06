@@ -2,29 +2,28 @@ import React from "react";
 import telephone from "../store/gallery/telephone.png";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { LoginOutlined, LogoutOutlined } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { LoginOutlined } from "@mui/icons-material";
 import { Tooltip } from "@material-ui/core";
-import { signOutUser } from "../redux/apiCalls";
 import LoginNavMenu from "./LoginNavMenu";
+import AccountPopover from "./AccountPopover";
+import LogoutConfirmDialog from "./LogoutConfirmDialog";
+import { useState } from "react";
 
 const Navbar = ({ fixed }) => {
-  const user = useSelector((state) => state.user.user);
+  const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [openLogout, setOpenLogout] = useState(false);
 
   const onCallOrder = () => {
     window.open("tel:256700605769");
   };
 
-  const onOpenAdmin = () => {
-    if (user?.level !== "admin") {
-    } else {
-      navigate("/admin");
-    }
-  };
   return (
     <Container>
+      {openLogout && (
+        <LogoutConfirmDialog open={openLogout} setOpen={setOpenLogout} />
+      )}
       <div id="topNav" className="nav">
         <div
           className="item"
@@ -53,31 +52,42 @@ const Navbar = ({ fixed }) => {
               Perfect Home Services
             </div>
             <li className="listItem">Events</li>
-            {user?.level === "admin" && (
+            {user?.type === "admin" && (
               <li
                 className="listItem"
-                onClick={() => {
-                  onOpenAdmin();
-                }}
+                onClick={() => navigate("/admin/dash/home")}
               >
-                Admin
+                Admin Dash
+              </li>
+            )}
+            {user?.type === "sp" && (
+              <li className="listItem" onClick={() => navigate("/SPdash/home")}>
+                SP Dash
               </li>
             )}
             <li className="listItem">Contact</li>
           </ul>
         </div>
         <div className="item">
-          <LoginNavMenu>
-            <Tooltip title="Login" arrow>
-              <LoginOutlined
-                style={{
-                  color: "white",
-                  cursor: "pointer",
-                  fontSize: "30px",
-                }}
-              />
-            </Tooltip>
-          </LoginNavMenu>
+          {!user && (
+            <LoginNavMenu>
+              <Tooltip title="Login" arrow>
+                <LoginOutlined
+                  style={{
+                    color: "white",
+                    cursor: "pointer",
+                    fontSize: "30px",
+                  }}
+                />
+              </Tooltip>
+            </LoginNavMenu>
+          )}
+          {user && (
+            <AccountPopover
+              user={user}
+              openLogout={() => setOpenLogout(true)}
+            />
+          )}
         </div>
       </div>
     </Container>

@@ -12,12 +12,46 @@ import {
   Unstable_Grid2 as Grid,
 } from "@mui/material";
 import { CameraAlt, Close, SaveAs } from "@mui/icons-material";
-import { dummySPs } from "../../../store/dummies";
 import styled from "styled-components";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useSnackbar } from "notistack";
 
-const EditCompanyInfo = ({ closeEditor }) => {
-  const SP = dummySPs[0];
+const EditCompanyInfo = ({ closeEditor, sp }) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const { services } = useSelector((state) => state.services);
+  const [category, setCategory] = useState(null);
+  const [middleman, setMiddleman] = useState({
+    id: "",
+    email: "",
+    title: "",
+    tel: "",
+    location: "",
+    desc: "",
+    logo: "",
+    Sid: "",
+    Sname: "",
+  });
 
+  useEffect(() => {
+    setMiddleman({
+      id: sp.id,
+      email: sp.email,
+      title: sp.title,
+      tel: sp.tel,
+      location: sp.location,
+      desc: sp.desc,
+      logo: sp.logo,
+      Sid: sp.Sid,
+      Sname: sp.Sname,
+    });
+
+    if (services) {
+      setCategory(
+        services.filter((i) => parseInt(i.id, 10) === parseInt(sp.Sid, 10))[0]
+      );
+    }
+  }, [sp, services]);
   //Image change handler
   const editAvatorHandler = (e) => {
     //console.log(e.target.files);
@@ -26,7 +60,19 @@ const EditCompanyInfo = ({ closeEditor }) => {
     e.target.value = null;
   };
 
-  const resetFields = () => {};
+  const resetFields = () => {
+    setMiddleman({
+      id: sp.id,
+      email: sp.email,
+      title: sp.title,
+      tel: sp.tel,
+      location: sp.location,
+      desc: sp.desc,
+      logo: sp.logo,
+      Sid: sp.Sid,
+      Sname: sp.Sname,
+    });
+  };
 
   const closeHandler = () => {
     resetFields();
@@ -77,7 +123,7 @@ const EditCompanyInfo = ({ closeEditor }) => {
                     }}
                   >
                     <img
-                      src={SP.logo}
+                      src={middleman.logo && middleman.logo}
                       alt="logo"
                       style={{
                         width: "100%",
@@ -100,9 +146,14 @@ const EditCompanyInfo = ({ closeEditor }) => {
                 <TextField
                   fullWidth
                   label="Company Name"
-                  // onChange={() => {}}
                   required
-                  // value={SP.title}
+                  value={middleman.title}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      title: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -110,39 +161,53 @@ const EditCompanyInfo = ({ closeEditor }) => {
                   fullWidth
                   label="Location"
                   name="location"
-                  // onChange={() => {}}
                   required
-                  // value={SP.location}
+                  value={middleman.location}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      location: e.target.value,
+                    })
+                  }
                 />
               </Grid>
             </Grid>
 
-            <Grid container spacing={2} xs={12} md={6} columns={6}>
+            <Grid container middlemanacing={2} xs={12} md={6} columns={6}>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Email Address"
-                  // onChange={() => {}}
                   required
-                  // value={SP.email[0]}
+                  value={middleman.email}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      email: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Phone Number"
-                  // onChange={() => {}}
                   required
-                  // value={SP.tel[0]}
+                  value={middleman.tel}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      tel: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Category"
-                  // onChange={() => {}}
                   required
-                  // value={"Cleaning"}
+                  value={middleman.Sname}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -152,9 +217,14 @@ const EditCompanyInfo = ({ closeEditor }) => {
                   helperText="Not More than 200 words"
                   multiline
                   rows={6}
-                  // onChange={() => {}}
                   required
-                  // value={SP.desc}
+                  value={middleman.desc}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      desc: e.target.value,
+                    })
+                  }
                 />
               </Grid>
             </Grid>
@@ -175,7 +245,11 @@ const EditCompanyInfo = ({ closeEditor }) => {
         >
           Close Editor
         </Button>
-        <Button variant="outlined" color="secondary">
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => resetFields()}
+        >
           Reset Fields
         </Button>
         <Button
@@ -185,6 +259,11 @@ const EditCompanyInfo = ({ closeEditor }) => {
             <SvgIcon size="small">
               <SaveAs />
             </SvgIcon>
+          }
+          onClick={() =>
+            enqueueSnackbar("Our Engineers Are Working On It", {
+              variant: "info",
+            })
           }
         >
           Save details

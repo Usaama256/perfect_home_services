@@ -8,21 +8,14 @@ import {
   Typography,
   Stack,
   MenuItem,
-  Avatar,
   IconButton,
 } from "@mui/material";
 // components
 import MenuPopover from "../../components/MenuPopover";
-import { imgAvator } from "../../store/images";
 import { Home, Person, Settings } from "@mui/icons-material";
+import BackgroundLetterAvatars from "../BackgroundLetterAvatars";
 
 // ----------------------------------------------------------------------
-const account = {
-  displayName: "Kimuli Jamil",
-  email: "demo@here.cc",
-  photoURL: imgAvator,
-};
-
 const MENU_OPTIONS = [
   {
     label: "Home",
@@ -43,7 +36,7 @@ const MENU_OPTIONS = [
 
 // ----------------------------------------------------------------------
 
-const AccountPopover = () => {
+const AccountPopover = ({ user, openLogout }) => {
   const anchorRef = useRef(null);
 
   const [open, setOpen] = useState(null);
@@ -76,7 +69,7 @@ const AccountPopover = () => {
           }),
         }}
       >
-        <Avatar src={account.photoURL} alt="photoURL" />
+        <BackgroundLetterAvatars name={`${user.firstName} ${user.lastName}`} />
       </IconButton>
 
       <MenuPopover
@@ -95,10 +88,10 @@ const AccountPopover = () => {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {user.firstName}
           </Typography>
           <Typography variant="body2" sx={{ color: "text.secondary" }} noWrap>
-            {account.email}
+            {user.email}
           </Typography>
         </Box>
 
@@ -119,7 +112,13 @@ const AccountPopover = () => {
 
         <Divider sx={{ borderStyle: "dashed" }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        <MenuItem
+          onClick={() => {
+            openLogout();
+            handleClose();
+          }}
+          sx={{ m: 1 }}
+        >
           Logout
         </MenuItem>
       </MenuPopover>

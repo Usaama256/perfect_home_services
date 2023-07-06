@@ -1,6 +1,4 @@
-import { useTheme } from "@mui/material/styles";
 import { Grid, Container, Typography, Tooltip, Card } from "@mui/material";
-
 import { SearchSharp } from "@material-ui/icons";
 import { Close } from "@mui/icons-material";
 import InputLabel from "@mui/material/InputLabel";
@@ -10,41 +8,45 @@ import Select from "@mui/material/Select";
 
 import styled from "styled-components";
 import { useSnackbar } from "notistack";
-import { myRequest } from "../../../store/requestMethods";
 import { useState } from "react";
 import CircularLoader from "../../CircularLoader";
-import { servicesArr } from "../../../store/services";
-import { dummySPs } from "../../../store/dummies";
 import CompanyCard from "./CompanyCard";
-// import { myRequest } from "../../store/requestMethods";
-// import { servicesArr } from "../../store/services";
-// import CircularLoader from "../../components/CircularLoader";
-// import { dummySPs } from "../../store/dummies";
-// import CompanyCard from "../../components/admin/sps/CompanyCard";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchSPsAdmin } from "../../../redux/apiCalls";
 
 // ----------------------------------------------------------------------
 const SPsMain = () => {
+  const { sps, services } = useSelector((state) => state.adminData);
+  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
+  const [displayed, setDisplayed] = useState(null);
+  const [filterBy, setfilterBy] = useState("All-0");
   const [searchTxt, setSearchTxt] = useState("");
   const [searchMode, setSearchMode] = useState(false);
   const [searching, setSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState(null);
+  // const [searchResults, setSearchResults] = useState(null);
+
+  useEffect(() => {
+    fetchSPsAdmin(dispatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (sps) {
+      const Sid = parseInt(filterBy.split("-")[1], 10);
+      if (Sid === 0) {
+        setDisplayed(sps);
+      } else {
+        setDisplayed(sps.filter((i) => parseInt(i.Sid, 10) === Sid));
+      }
+    }
+  }, [filterBy, sps]);
 
   const searchHandler = async (txt) => {
-    const ctrl = new AbortController();
     try {
       if (txt?.length > 1) {
         setSearching(true);
-        const res = await myRequest.get(``, {
-          signal: ctrl.signal,
-        });
-        if (res.status === 200) {
-          setSearchMode(true);
-          setSearchResults(res.data.filtered);
-        } else {
-          console.log("Search Failed: E42174");
-          enqueueSnackbar("Search Failed: E42174", { variant: "error" });
-        }
       } else {
         enqueueSnackbar("Search with at least 2 characters", {
           variant: "warning",
@@ -73,7 +75,6 @@ const SPsMain = () => {
     } finally {
       setSearching(false);
     }
-    return () => ctrl.abort();
   };
 
   const onSearching = (e) => {
@@ -141,14 +142,14 @@ const SPsMain = () => {
               <Select
                 labelId="select-small"
                 id="select-small"
-                value={"All"}
+                value={filterBy.split("-")[0]}
                 label="Filter By"
-                // onChange={(event) => setfilterBy(event.target.value)}
+                onChange={(e) => setfilterBy(e.target.value)}
               >
-                <MenuItem value="All">All</MenuItem>
-                {servicesArr.map((i, n) => {
+                <MenuItem value="All-0">All</MenuItem>
+                {services?.map((i, n) => {
                   return (
-                    <MenuItem value={i.name} key={i.id}>
+                    <MenuItem value={`${i.name}-${i.Sid}`} key={i.id}>
                       {i.name}
                     </MenuItem>
                   );
@@ -160,7 +161,7 @@ const SPsMain = () => {
         <Grid item xs={12} md={12} lg={12}>
           <Card style={{ padding: "10px" }}>
             <Grid container spacing={3} xs={12} md={12} lg={12}>
-              {[...dummySPs, ...dummySPs].map((item, index) => {
+              {displayed?.map((item, index) => {
                 return (
                   <Grid item xs={12} md={12} lg={4}>
                     <CompanyCard {...item} key={index} />

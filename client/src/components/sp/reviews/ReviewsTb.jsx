@@ -1,12 +1,10 @@
 import PropTypes from "prop-types";
 import {
   Box,
-  Button,
   Card,
   CardActions,
   CardHeader,
   Divider,
-  SvgIcon,
   Table,
   TableBody,
   TableCell,
@@ -16,17 +14,16 @@ import {
 } from "@mui/material";
 import Chip from "@mui/material/Chip";
 import Scrollbar from "../../Scrollbar";
-import { ArrowForwardIos } from "@mui/icons-material";
 import { fDateTimeSuffix2, fToNow } from "../../../store/formatTime";
-import { imgAvator } from "../../../store/images";
+import BackgroundLetterAvatars from "../../BackgroundLetterAvatars";
 
-const ReviewsTb = ({ reviews, sx }) => {
+const ReviewsTb = ({ comments, userActive, sx }) => {
   const onCallClient = (tel) => {
-    window.open(`tel:${tel}`);
+    userActive && window.open(`tel:${tel}`);
   };
 
   const onEmailClient = (email) => {
-    window.open(`mailto:${email}`);
+    userActive && window.open(`mailto:${email}`);
   };
 
   return (
@@ -43,50 +40,51 @@ const ReviewsTb = ({ reviews, sx }) => {
                 <TableCell>Contacts</TableCell>
                 <TableCell>Message</TableCell>
                 <TableCell sortDirection="desc">Date</TableCell>
+                <TableCell>Status</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {reviews?.map((rev, i) => {
-                // const createdAt = format(order.createdAt, "dd/MM/yyyy");
+              {comments?.map((comm, i) => {
                 return (
-                  <TableRow hover key={i}>
+                  <TableRow
+                    hover
+                    key={i}
+                    style={{
+                      background: `${
+                        parseInt(comm.status, 10) === 1 ? "" : "#ff5d5d7c"
+                      }`,
+                    }}
+                  >
                     <TableCell>
-                      <Box
-                        component="img"
-                        alt="img"
-                        src={imgAvator}
-                        sx={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: 1.5,
-                          flexShrink: 0,
-                        }}
-                      />
+                      <BackgroundLetterAvatars name={comm.username} />
                     </TableCell>
-                    <TableCell>{rev.name}</TableCell>
+                    <TableCell>{comm.username}</TableCell>
                     <TableCell>
                       <Tooltip title="Send Email" arrow>
                         <Chip
-                          label={rev.email}
+                          label={comm.email}
                           color="info"
-                          onClick={() => onEmailClient(rev.email)}
+                          onClick={() => onEmailClient(comm.email)}
                           variant="outlined"
                         />
                       </Tooltip>
                       &ensp;
                       <Tooltip title="Call Client" arrow>
                         <Chip
-                          label={rev.phone}
+                          label={comm.phone}
                           color="info"
-                          onClick={() => onCallClient(rev.phone)}
+                          onClick={() => onCallClient(comm.phone)}
                           variant="outlined"
                         />
                       </Tooltip>
                     </TableCell>
-                    <TableCell>{rev.message}</TableCell>
+                    <TableCell>{comm.comment}</TableCell>
                     <TableCell>
-                      {fDateTimeSuffix2(rev.createdAt)} ({fToNow(rev.createdAt)}
-                      )
+                      {fDateTimeSuffix2(comm.createdAt)} (
+                      {fToNow(comm.createdAt)})
+                    </TableCell>
+                    <TableCell>
+                      {parseInt(comm.status, 10) === 1 ? "Visible" : "Deleted"}
                     </TableCell>
                   </TableRow>
                 );
@@ -97,7 +95,7 @@ const ReviewsTb = ({ reviews, sx }) => {
       </Scrollbar>
       <Divider />
       <CardActions sx={{ justifyContent: "flex-end" }}>
-        <Button
+        {/* <Button
           color="inherit"
           endIcon={
             <SvgIcon fontSize="small">
@@ -108,7 +106,7 @@ const ReviewsTb = ({ reviews, sx }) => {
           variant="text"
         >
           View all
-        </Button>
+        </Button> */}
       </CardActions>
     </Card>
   );

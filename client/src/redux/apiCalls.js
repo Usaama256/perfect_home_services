@@ -1,93 +1,211 @@
-import axios from "axios";
+// import axios from "axios";
 import { myRequest } from "../store/requestMethods";
 import {
-  appDataFetchStart,
-  appDataFetchSuccess,
-  appDataFetchFail,
-  addItem,
-  removeItem,
-  changeNumber,
-  changeTotal,
+  servicesFetchStart,
+  servicesFetchSuccess,
+  servicesFetchFail,
+  servicesFetchRefreshStart,
+  servicesFetchRefreshSuccess,
+  // servicesCleanup,
+  sPsFetchStart,
+  sPsFetchSuccess,
+  sPsFetchFail,
+  sPsFetchRefreshStart,
+  sPsFetchRefreshSuccess,
+  // sPsCleanup,
   loginStart,
+  byPassloginStart,
   loginSuccess,
   loginFail,
   userCleanup,
+  setServices,
+  setUsers,
+  setSps,
+  adminDataCleanup,
+  setProducts,
+  setComments,
+  setCallings,
+  spDataCleanup,
 } from "./ReduxSlices";
 
 // axios.defaults.withCredentials = true;
 
-//Fetching all products
-export const fetchAllPdts = async (dispatch) => {
-  try {
-    dispatch(appDataFetchStart());
-    const res = await myRequest.get("/products/getproducts");
-    dispatch(appDataFetchSuccess(res.data));
-  } catch (err) {
-    console.log(err);
-    if (err.response) {
-      console.log(err.response, err.message);
-      dispatch(appDataFetchFail(err.response.data));
-    } else if (err.request) {
-      if (err.request.status) {
-        console.error(err.message, err.request);
-        dispatch(appDataFetchFail(err.request.response));
-      } else {
-        console.log(err.request, err.message);
-        dispatch(appDataFetchFail("Connection Failed Or Refused"));
+//Fetching services
+export const fetchServices = async (dispatch, refresh, oldServices) => {
+  if (refresh === true) {
+    try {
+      dispatch(servicesFetchRefreshStart());
+      const res = await myRequest.get("/user.api/fetchServices");
+      if (res.status === 200) {
+        if (JSON.stringify(res.data) === JSON.stringify(oldServices)) {
+          return;
+        } else {
+          dispatch(servicesFetchRefreshSuccess(res.data));
+        }
       }
-    } else {
-      console.log(err.message);
-      dispatch(appDataFetchFail(err.message));
+    } catch (err) {
+      console.log(err);
+      if (err.response) {
+        console.log(err.response, err.message);
+      } else if (err.request) {
+        if (err.request.status) {
+          console.error(err.message, err.request);
+        } else {
+          console.log(err.request, err.message);
+        }
+      } else {
+        console.log(err.message);
+      }
     }
-  }
-};
-
-export const addItemToCart = (cart, item, dispatch) => {
-  var replace = false;
-  // console.log(cart, item);
-
-  const allCart = cart?.map((i) => {
-    if (i.prod_id === item.prod_id) {
-      replace = true;
-      return item;
-    } else {
-      return i;
-    }
-  });
-  if (replace) {
-    dispatch(addItem(allCart));
-    dispatch(changeNumber(allCart.length));
-    dispatch(changeTotal(getTotal(allCart)));
   } else {
-    if (cart) {
-      const arrr = [...cart, item];
-      dispatch(addItem(arrr));
-      dispatch(changeNumber(arrr.length));
-      dispatch(changeTotal(getTotal(arrr)));
-    } else {
-      dispatch(addItem([item]));
-      dispatch(changeNumber(1));
-      dispatch(changeTotal(getTotal([item])));
+    try {
+      dispatch(servicesFetchStart());
+      const res = await myRequest.get("/user.api/fetchServices");
+      if (res.status === 200) {
+        dispatch(servicesFetchSuccess(res.data));
+      }
+    } catch (err) {
+      console.log(err);
+      if (err.response) {
+        console.log(err.response, err.message);
+        dispatch(servicesFetchFail(err.response.data));
+      } else if (err.request) {
+        if (err.request.status) {
+          console.error(err.message, err.request);
+          dispatch(servicesFetchFail(err.request.response));
+        } else {
+          console.log(err.request, err.message);
+          dispatch(servicesFetchFail("Connection Failed Or Refused"));
+        }
+      } else {
+        console.log(err.message);
+        dispatch(servicesFetchFail(err.message));
+      }
     }
   }
 };
 
-export const removeItemFromCart = (cart, id, dispatch) => {
-  const filtered = cart?.filter((item) => item.prod_id !== id);
-  //console.log(filtered);
-  dispatch(removeItem(filtered));
-  dispatch(changeNumber(filtered?.length));
-  dispatch(changeTotal(getTotal(filtered)));
+//Fetching SPs
+export const fetchSPs = async (dispatch, refresh, oldSps) => {
+  if (refresh === true) {
+    try {
+      dispatch(sPsFetchRefreshStart());
+      const res = await myRequest.get("/user.api/fetchSPs");
+      if (res.status === 200) {
+        if (JSON.stringify(res.data) === JSON.stringify(oldSps)) {
+          return;
+        } else {
+          dispatch(sPsFetchRefreshSuccess(res.data));
+        }
+      }
+    } catch (err) {
+      console.log(err);
+      if (err.response.status === 404) {
+        dispatch(sPsFetchRefreshSuccess([]));
+      }
+      if (err.response) {
+        console.log(err.response, err.message);
+      } else if (err.request) {
+        if (err.request.status) {
+          console.error(err.message, err.request);
+        } else {
+          console.log(err.request, err.message);
+        }
+      } else {
+        console.log(err.message);
+      }
+    }
+  } else {
+    try {
+      dispatch(sPsFetchStart());
+      const res = await myRequest.get("/user.api/fetchSPs");
+      if (res.status === 200) {
+        dispatch(sPsFetchSuccess(res.data));
+      }
+    } catch (err) {
+      console.log(err);
+      if (err.response) {
+        console.log(err.response, err.message);
+        dispatch(sPsFetchFail(err.response.data));
+      } else if (err.request) {
+        if (err.request.status) {
+          console.error(err.message, err.request);
+          dispatch(sPsFetchFail(err.request.response));
+        } else {
+          console.log(err.request, err.message);
+          dispatch(sPsFetchFail("Connection Failed Or Refused"));
+        }
+      } else {
+        console.log(err.message);
+        dispatch(sPsFetchFail(err.message));
+      }
+    }
+  }
 };
 
-export const signupUser = async (user, dispatch, navigate, enqueueSnackbar) => {
+//Client Sign Up
+export const cSignup = async (user, dispatch, navigate, enqueueSnackbar) => {
   try {
     dispatch(loginStart());
-    const res = await myRequest.post("/users/signup", user);
+    const res = await myRequest.post("/user.api/signup", user);
     if (res.status === 200) {
-      dispatch(loginSuccess(res.data));
+      dispatch(
+        loginSuccess({
+          ...res.data,
+          type: "client",
+        })
+      );
       navigate("/");
-      enqueueSnackbar("Account Created Successfully", { variant: "success" });
+      enqueueSnackbar("User Account Created Successfully", {
+        variant: "success",
+      });
+      enqueueSnackbar("Login Success", { variant: "success" });
+    } else {
+      dispatch(loginFail("An error occured"));
+      enqueueSnackbar("Login Failed", { variant: "error" });
+    }
+  } catch (err) {
+    enqueueSnackbar("Login Failed", { variant: "error" });
+    enqueueSnackbar(err.response?.data.message, { variant: "error" });
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+      dispatch(loginFail(err.response.data));
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+        dispatch(loginFail(err.request.response));
+      } else {
+        console.log(err.request, err.message);
+        dispatch(loginFail("Connection Failed Or Refused"));
+      }
+    } else {
+      console.log(err.message);
+      dispatch(loginFail(err.message));
+    }
+  }
+};
+
+//Client Login
+export const cSignIn = async (
+  user,
+  type,
+  dispatch,
+  navigate,
+  enqueueSnackbar
+) => {
+  //type => email || tel
+  try {
+    dispatch(loginStart());
+    const res = await myRequest.post(`/user.api/login/${type}`, user);
+    if (res.status === 200) {
+      dispatch(
+        loginSuccess({
+          ...res.data,
+          type: "client",
+        })
+      );
+      navigate("/");
       enqueueSnackbar("Login Success", { variant: "success" });
     } else {
       dispatch(loginFail("An error occured"));
@@ -114,13 +232,27 @@ export const signupUser = async (user, dispatch, navigate, enqueueSnackbar) => {
   }
 };
 
-export const signInUser = async (user, dispatch, navigate, enqueueSnackbar) => {
+//SP Sign Up
+export const SPsignup = async (newSp, dispatch, navigate, enqueueSnackbar) => {
   try {
-    dispatch(loginStart());
-    const res = await myRequest.post("/users/login", user);
+    dispatch(byPassloginStart());
+    const res = await myRequest.post("/sp.api/signup", newSp);
     if (res.status === 200) {
-      dispatch(loginSuccess(res.data));
-      navigate("/");
+      dispatch(
+        loginSuccess({
+          ...res.data,
+          type: "sp",
+        })
+      );
+      if (parseInt(res.data.approved, 10) === 1) {
+        //Login
+        navigate("/SPdash/home");
+      } else {
+        navigate("/SPdash/not_approved");
+      }
+      enqueueSnackbar("Service Provider Account Created Successfully", {
+        variant: "success",
+      });
       enqueueSnackbar("Login Success", { variant: "success" });
     } else {
       dispatch(loginFail("An error occured"));
@@ -147,108 +279,275 @@ export const signInUser = async (user, dispatch, navigate, enqueueSnackbar) => {
   }
 };
 
-export const signOutUser = (dispatch) => {
+//SP login
+export const SPsignin = async (sp, dispatch, navigate, enqueueSnackbar) => {
+  try {
+    dispatch(byPassloginStart());
+    const res = await myRequest.post("/sp.api/login", sp);
+    if (res.status === 200) {
+      dispatch(
+        loginSuccess({
+          ...res.data,
+          type: "sp",
+        })
+      );
+      if (parseInt(res.data.approved, 10) === 1) {
+        //Login
+        navigate("/SPdash/home");
+      } else {
+        navigate("/SPdash/not_approved");
+      }
+      enqueueSnackbar("Login Success", { variant: "success" });
+    } else {
+      dispatch(loginFail("An error occured"));
+      enqueueSnackbar("Login Failed", { variant: "error" });
+    }
+  } catch (err) {
+    enqueueSnackbar(err.response?.data, { variant: "error" });
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+      dispatch(loginFail(err.response.data));
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+        dispatch(loginFail(err.request.response));
+      } else {
+        console.log(err.request, err.message);
+        dispatch(loginFail("Connection Failed Or Refused"));
+      }
+    } else {
+      console.log(err.message);
+      dispatch(loginFail(err.message));
+    }
+  }
+};
+
+//SP login auth bypass
+export const SPsigninBypass = async (spId, user, dispatch, navigate) => {
+  try {
+    dispatch(byPassloginStart());
+    const res = await myRequest.post(`/sp.api/bypassSPfetch/${spId}`, {
+      token: "SWQ324232LFP",
+    });
+    if (res.status === 200) {
+      if (
+        JSON.stringify({
+          ...res.data,
+          type: "sp",
+        }) === JSON.stringify(user)
+      ) {
+      } else {
+        dispatch(
+          loginSuccess({
+            ...res.data,
+            type: "sp",
+          })
+        );
+      }
+      if (navigate) {
+        if (parseInt(res.data.approved, 10) === 1) {
+          //Login
+          navigate("/SPdash/home");
+        } else {
+          navigate("/SPdash/not_approved");
+        }
+      }
+    } else {
+    }
+  } catch (err) {
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+      } else {
+        console.log(err.request, err.message);
+      }
+    } else {
+      console.log(err.message);
+    }
+  }
+};
+
+//admin login
+export const adminSignin = async (
+  admin,
+  dispatch,
+  navigate,
+  enqueueSnackbar
+) => {
+  try {
+    dispatch(byPassloginStart());
+    const res = await myRequest.post("/admin.api/login", admin);
+    if (res.status === 200) {
+      dispatch(
+        loginSuccess({
+          ...res.data,
+          type: "admin",
+        })
+      );
+      navigate("/admin/dash/home");
+    } else {
+      dispatch(loginFail("An error occured"));
+      enqueueSnackbar("Login Failed", { variant: "error" });
+    }
+  } catch (err) {
+    enqueueSnackbar(err.response?.data, { variant: "error" });
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+      dispatch(loginFail(err.response.data));
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+        dispatch(loginFail(err.request.response));
+      } else {
+        console.log(err.request, err.message);
+        dispatch(loginFail("Connection Failed Or Refused"));
+      }
+    } else {
+      console.log(err.message);
+      dispatch(loginFail(err.message));
+    }
+  }
+};
+
+export const signOutUser = (dispatch, navigate) => {
+  navigate("/");
   dispatch(userCleanup());
+  dispatch(adminDataCleanup());
+  dispatch(spDataCleanup());
 };
 
-const getTotal = (arr) => {
-  var total = 0;
-  arr?.map((i) => {
-    total += i.total_price;
-    return 0;
-  });
-  return total;
+export const fetchSPsAdmin = async (dispatch) => {
+  try {
+    const res = await myRequest.get("/admin.api/fetchSPs");
+    if (res.status === 200) {
+      dispatch(setSps(res.data));
+    }
+  } catch (err) {
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+      } else {
+        console.log(err.request, err.message);
+      }
+    } else {
+      console.log(err.message);
+    }
+  }
 };
-// //Fetching App Data
-// export const appDataFetch = (dispatch) => {
-//   dispatch(appDataFetchStart());
-//   axios
-//     .all([
-//       //myRequest.get("/admin/kawucards"),
-//       //myRequest.get("/allsch"),
-//       //myRequest.get("/allagents"),
-//       //myRequest.get("/admin/allparents"),
-//       //myRequest.get("/admin/alltransactions"),
-//       //myRequest.get("/admin/allstudents"),
-//       //myRequest.get("/admin/comm/get/systemrecip"),
-//     ])
-//     .then(
-//       axios.spread((...responses) => {
-//         const appData = {
-//           kawuCards: responses[0].data,
-//           schools: responses[1].data,
-//           agents: responses[2].data,
-//           parents: responses[3].data,
-//           transactions: responses[4].data,
-//           students: responses[5].data,
-//           sysCommRec: responses[6].data,
-//         };
-//         dispatch(appDataFetchSuccess(appData));
-//       })
-//     )
-//     .catch((error) => {
-//       if (error.response) {
-//         console.log(error.response, error.message);
-//         dispatch(appDataFetchFail(error.response.data));
-//       } else if (error.request) {
-//         if (error.request.status) {
-//           console.error(error.message, error.request);
-//           dispatch(appDataFetchFail(error.request.response));
-//         } else {
-//           console.log(error.request, error.message);
-//           dispatch(appDataFetchFail("Connection Failed Or Refused"));
-//         }
-//       } else {
-//         console.log(error.message);
-//         dispatch(appDataFetchFail(error.message));
-//       }
-//     });
-// };
+export const fetchUsersAdmin = async (dispatch) => {
+  try {
+    const res = await myRequest.get("/admin.api/fetchUsers");
+    if (res.status === 200) {
+      dispatch(setUsers(res.data));
+    }
+  } catch (err) {
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+      } else {
+        console.log(err.request, err.message);
+      }
+    } else {
+      console.log(err.message);
+    }
+  }
+};
 
-// //Refreshing App Data
-// export const appDataRefreshHandler = (dispatch) => {
-//   dispatch(appDataFetchRefreshStart());
-//   axios
-//     .all([
-//       // myRequest.get("/admin/kawucards"),
-//       // myRequest.get("/allsch"),
-//       // myRequest.get("/allagents"),
-//       // myRequest.get("/admin/allparents"),
-//       // myRequest.get("/admin/alltransactions"),
-//       // myRequest.get("/admin/allstudents"),
-//       // myRequest.get("/admin/comm/get/systemrecip"),
-//     ])
-//     .then(
-//       axios.spread((...responses) => {
-//         const appData = {
-//           kawuCards: responses[0].data,
-//           schools: responses[1].data,
-//           agents: responses[2].data,
-//           parents: responses[3].data,
-//           transactions: responses[4].data,
-//           students: responses[5].data,
-//           sysCommRec: responses[6].data,
-//         };
-//         dispatch(appDataFetchRefreshSuccess(appData));
-//       })
-//     )
-//     .catch((error) => {
-//       if (error.response) {
-//         console.log("Refresh Error: ", error.response, error.message);
-//         dispatch(appDataFetchFail(`Refresh Error: ${error.response.data}`));
-//       } else if (error.request) {
-//         if (error.request.status) {
-//           console.log("Refresh Error: ", error.request, error.message);
-//           dispatch(
-//             appDataFetchFail(`Refresh Error: ${error.request.response}`)
-//           );
-//         } else {
-//           console.log("Refresh Error: ", error.request, error.message);
-//           dispatch(appDataFetchFail(`Refresh Error: ${error.message}`));
-//         }
-//       } else {
-//         console.log("Refresh Error: ", error.message);
-//         dispatch(appDataFetchFail(`Refresh Error: ${error.message}`));
-//       }
-//     });
-// };
+export const fetchServicesAdmin = async (dispatch) => {
+  try {
+    const res = await myRequest.get("/admin.api/getservices");
+    if (res.status === 200) {
+      dispatch(setServices(res.data));
+    }
+  } catch (err) {
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+      } else {
+        console.log(err.request, err.message);
+      }
+    } else {
+      console.log(err.message);
+    }
+  }
+};
+
+export const fetchSpProductsSP = async (SPid, dispatch) => {
+  try {
+    const res = await myRequest.get(`/sp.api/getPdts/${SPid}`);
+    if (res.status === 200) {
+      dispatch(setProducts(res.data));
+    }
+  } catch (err) {
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+      } else {
+        console.log(err.request, err.message);
+      }
+    } else {
+      console.log(err.message);
+    }
+  }
+};
+
+export const fetchSpCommentsSP = async (SPid, dispatch) => {
+  try {
+    const res = await myRequest.get(`/sp.api/fetchComments/${SPid}`);
+    if (res.status === 200) {
+      dispatch(setComments(res.data));
+    }
+  } catch (err) {
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+      } else {
+        console.log(err.request, err.message);
+      }
+    } else {
+      console.log(err.message);
+    }
+  }
+};
+
+export const fetchSPcallsSP = async (SPid, dispatch) => {
+  try {
+    const res = await myRequest.get(`/sp.api/userContactAtempts/${SPid}`);
+    if (res.status === 200) {
+      dispatch(setCallings(res.data));
+    }
+  } catch (err) {
+    console.log(err);
+    if (err.response) {
+      console.log(err.response, err.message);
+    } else if (err.request) {
+      if (err.request.status) {
+        console.error(err.message, err.request);
+      } else {
+        console.log(err.request, err.message);
+      }
+    } else {
+      console.log(err.message);
+    }
+  }
+};

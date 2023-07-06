@@ -10,10 +10,9 @@ import {
   Typography,
 } from "@mui/material";
 import { EditNote } from "@mui/icons-material";
-import { ownerSample } from "../../../store/dummies";
 
-const SpOwnerProfile = ({ editOwner }) => {
-  const SpOwner = ownerSample;
+const SpOwnerProfile = ({ editOwner, sp }) => {
+  const { owner } = sp;
 
   return (
     <Card
@@ -48,8 +47,8 @@ const SpOwnerProfile = ({ editOwner }) => {
             }}
           >
             <img
-              src={SpOwner.avator}
-              alt="logo"
+              src={owner.avator && owner.avator}
+              alt="avator"
               style={{
                 height: "100%",
                 width: "100%",
@@ -58,7 +57,7 @@ const SpOwnerProfile = ({ editOwner }) => {
             />
           </div>
           <Typography gutterBottom variant="h5">
-            {SpOwner.position}
+            {owner.position}
           </Typography>
 
           <Stack
@@ -80,7 +79,7 @@ const SpOwnerProfile = ({ editOwner }) => {
               variant="body1"
               sx={{ margin: "0px !important" }}
             >
-              {SpOwner.firstName} {SpOwner.lastName}
+              {owner.firstName} {owner.lastName}
             </Typography>
           </Stack>
 
@@ -104,7 +103,7 @@ const SpOwnerProfile = ({ editOwner }) => {
               sx={{ margin: "0px !important" }}
             >
               <Typography color="text.secondary" variant="body1">
-                {SpOwner.location}
+                {owner.location}
               </Typography>
             </Stack>
           </Stack>
@@ -121,14 +120,14 @@ const SpOwnerProfile = ({ editOwner }) => {
               variant="h6"
               sx={{ margin: "0px" }}
             >
-              Email Address
+              Email Addres
             </Typography>
             <Stack
               direction="row"
               spacing={2}
               sx={{ margin: "0px !important" }}
             >
-              {SpOwner.email?.map((i, n) => (
+              {[owner.email].map((i, n) => (
                 <Typography color="text.secondary" variant="body1" key={n}>
                   {i}
                 </Typography>
@@ -148,14 +147,14 @@ const SpOwnerProfile = ({ editOwner }) => {
               variant="h6"
               sx={{ margin: "0px" }}
             >
-              Telephone Contact(s)
+              Telephone Contact
             </Typography>
             <Stack
               direction="row"
               spacing={2}
               sx={{ margin: "0px !important" }}
             >
-              {SpOwner.tel?.map((i, n) => (
+              {[owner.tel].map((i, n) => (
                 <Typography color="text.secondary" variant="body1" key={n}>
                   {i}
                 </Typography>
@@ -182,7 +181,7 @@ const SpOwnerProfile = ({ editOwner }) => {
               variant="body1"
               sx={{ margin: "0px !important" }}
             >
-              {SpOwner.desc}
+              {owner.desc}
             </Typography>
           </Stack>
         </Box>

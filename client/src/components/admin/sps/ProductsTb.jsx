@@ -12,8 +12,7 @@ import Typography from "@mui/material/Typography";
 import Paper from "@mui/material/Paper";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { Card, CardContent, CardHeader, Stack, Tooltip } from "@mui/material";
-import { Delete, Edit } from "@mui/icons-material";
+import { Card, CardContent, CardHeader, Stack } from "@mui/material";
 
 const imgCardSx = {
   overflow: "hidden",
@@ -76,28 +75,32 @@ const Row = ({ row }) => {
                   spacing={3}
                   sx={{ width: "100%" }}
                 >
-                  <Stack
-                    direction="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    spacing={3}
-                  >
-                    <Card style={imgCardSx}>
-                      {row.img1 && (
-                        <img
-                          src={row.img1}
-                          alt="img"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      )}
-                    </Card>
-                    <Typography variant="body1">Image One</Typography>
-                  </Stack>
-                  <Stack
+                  {row.images?.map((image, n) => {
+                    return (
+                      <Stack
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        spacing={3}
+                      >
+                        <Card style={imgCardSx}>
+                          {image && (
+                            <img
+                              src={image}
+                              alt="img"
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          )}
+                        </Card>
+                        <Typography variant="body1">Image {n + 1}</Typography>
+                      </Stack>
+                    );
+                  })}
+                  {/* <Stack
                     direction="column"
                     alignItems="center"
                     justifyContent="center"
@@ -138,7 +141,7 @@ const Row = ({ row }) => {
                       )}
                     </Card>
                     <Typography variant="body1">Image Three</Typography>
-                  </Stack>
+                  </Stack> */}
                 </Stack>
                 <br />
               </Table>

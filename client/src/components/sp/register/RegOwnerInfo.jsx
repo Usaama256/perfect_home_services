@@ -12,21 +12,83 @@ import {
   Unstable_Grid2 as Grid,
 } from "@mui/material";
 import { ArrowForwardIos, CameraAlt } from "@mui/icons-material";
-import { ownerSample } from "../../../store/dummies";
 import styled from "styled-components";
+import { useEffect, useState } from "react";
+import { useSnackbar } from "notistack";
+import {
+  validateEmail,
+  validatePhoneNumber1,
+} from "../../../store/otherMethods";
+import { imgFromLocalToBase64 } from "../../../store/base64ImgConverter";
 
-const RegOwnerInfo = ({ onNext }) => {
-  const SpOwner = ownerSample;
+const RegOwnerInfo = ({ onNext, spOwner, setSPowner }) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const [middleman, setMiddleman] = useState({
+    position: "",
+    firstName: "",
+    lastName: "",
+    location: "",
+    email: "",
+    tel: "",
+    desc: "",
+    avator: "",
+  });
+
+  useEffect(() => {
+    setMiddleman(spOwner);
+  }, [spOwner]);
+
+  const onHandleNext = () => {
+    // console.log(middleman);
+    if (
+      // middleman.position?.length > 1 &&
+      middleman.firstName?.length > 1 &&
+      middleman.lastName?.length > 1 &&
+      middleman.location?.length > 2 &&
+      middleman.email?.length > 6 &&
+      middleman.tel?.length > 9 &&
+      middleman.desc?.length > 10
+    ) {
+      if (validateEmail(middleman.email)) {
+        if (validatePhoneNumber1(middleman.tel)) {
+          setSPowner(middleman);
+          onNext();
+        } else {
+          enqueueSnackbar("Enter a valid email phone number", {
+            variant: "error",
+          });
+        }
+      } else {
+        enqueueSnackbar("Enter a valid email address", { variant: "error" });
+      }
+    } else {
+      enqueueSnackbar("Enter All Fields", { variant: "error" });
+    }
+  };
 
   //Image change handler
   const editAvatorHandler = (e) => {
     //console.log(e.target.files);
-    if (e.target.files.length !== 0) {
+    if (e.target.files?.length > 0) {
+      imgFromLocalToBase64(e.target.files[0]).then((base64str) => {
+        setMiddleman({ ...middleman, avator: base64str });
+      });
     }
     e.target.value = null;
   };
 
-  const resetFields = () => {};
+  const resetFields = () => {
+    setMiddleman({
+      position: "",
+      firstName: "",
+      lastName: "",
+      location: "",
+      email: "",
+      tel: "",
+      desc: "",
+      avator: "",
+    });
+  };
 
   return (
     <Card>
@@ -55,7 +117,7 @@ const RegOwnerInfo = ({ onNext }) => {
                     disabled={false}
                     name="imageUpload"
                     accept="image/*"
-                    onChange={editAvatorHandler}
+                    onChange={(e) => editAvatorHandler(e)}
                   />
                   <Card
                     style={{
@@ -71,15 +133,17 @@ const RegOwnerInfo = ({ onNext }) => {
                       width: 220,
                     }}
                   >
-                    <img
-                      src={SpOwner.avator}
-                      alt="logo"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
+                    {middleman.avator && (
+                      <img
+                        src={middleman.avator}
+                        alt="logo"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    )}
                   </Card>
                   <label htmlFor="admiImageUpload">
                     <UploadBtn>
@@ -95,28 +159,44 @@ const RegOwnerInfo = ({ onNext }) => {
                 <TextField
                   fullWidth
                   label="First Name"
-                  // onChange={() => {}}
                   required
-                  // value={SP.title}
+                  value={middleman.firstName}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      firstName: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={3}>
                 <TextField
                   fullWidth
                   label="Last Name"
-                  // onChange={() => {}}
                   required
-                  // value={SP.title}
+                  value={middleman.lastName}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      lastName: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
                   label="Location"
+                  helperText="Include your Country, district, division and village"
                   name="location"
-                  // onChange={() => {}}
                   required
-                  // value={SP.location}
+                  value={middleman.location}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      location: e.target.value,
+                    })
+                  }
                 />
               </Grid>
             </Grid>
@@ -126,26 +206,28 @@ const RegOwnerInfo = ({ onNext }) => {
                 <TextField
                   fullWidth
                   label="Email Address"
-                  // onChange={() => {}}
                   required
-                  // value={SP.email[0]}
+                  value={middleman.email}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      email: e.target.value,
+                    })
+                  }
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Phone Number (Primary)"
-                  // onChange={() => {}}
+                  label="Phone Number"
                   required
-                  // value={SP.tel[0]}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  fullWidth
-                  label="Phone Number (Optional)"
-                  // onChange={() => {}}
-                  // value={SP.tel[0]}
+                  value={middleman.tel}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      tel: e.target.value,
+                    })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -155,9 +237,14 @@ const RegOwnerInfo = ({ onNext }) => {
                   helperText="Not More than 120 words"
                   multiline
                   rows={10}
-                  // onChange={() => {}}
                   required
-                  // value={SP.desc}
+                  value={middleman.desc}
+                  onChange={(e) =>
+                    setMiddleman({
+                      ...middleman,
+                      desc: e.target.value,
+                    })
+                  }
                 />
               </Grid>
             </Grid>
@@ -166,7 +253,11 @@ const RegOwnerInfo = ({ onNext }) => {
       </CardContent>
       <Divider />
       <CardActions sx={{ justifyContent: "flex-end" }}>
-        <Button variant="outlined" color="secondary">
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => resetFields()}
+        >
           Reset Fields
         </Button>
         <Button
@@ -177,7 +268,7 @@ const RegOwnerInfo = ({ onNext }) => {
               <ArrowForwardIos />
             </SvgIcon>
           }
-          onClick={() => onNext()}
+          onClick={() => onHandleNext()}
         >
           Next
         </Button>

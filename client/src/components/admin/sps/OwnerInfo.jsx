@@ -1,17 +1,14 @@
 import {
   Box,
-  Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   Divider,
   Stack,
-  SvgIcon,
   TextField,
   Unstable_Grid2 as Grid,
 } from "@mui/material";
-import { SaveAs } from "@mui/icons-material";
 
 const OwnerInfo = ({ data }) => {
   return (
@@ -47,7 +44,7 @@ const OwnerInfo = ({ data }) => {
                     }}
                   >
                     <img
-                      src={data.avator}
+                      src={data?.avator}
                       alt="logo"
                       style={{
                         width: "100%",
@@ -63,7 +60,7 @@ const OwnerInfo = ({ data }) => {
                   fullWidth
                   label="First Name"
                   InputProps={{ readOnly: true }}
-                  value={data.firstName}
+                  value={data?.firstName}
                   sx={{ cursor: "pointer !important" }}
                 />
               </Grid>
@@ -72,7 +69,7 @@ const OwnerInfo = ({ data }) => {
                   fullWidth
                   label="Last Name"
                   InputProps={{ readOnly: true }}
-                  value={data.lastName}
+                  value={data?.lastName}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -80,7 +77,7 @@ const OwnerInfo = ({ data }) => {
                   fullWidth
                   label="Location"
                   InputProps={{ readOnly: true }}
-                  value={data.location}
+                  value={data?.location}
                 />
               </Grid>
             </Grid>
@@ -91,7 +88,7 @@ const OwnerInfo = ({ data }) => {
                   fullWidth
                   label="Email Address"
                   InputProps={{ readOnly: true }}
-                  value={data.email[0]}
+                  value={data?.email}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -99,7 +96,7 @@ const OwnerInfo = ({ data }) => {
                   fullWidth
                   label="Phone Number"
                   InputProps={{ readOnly: true }}
-                  value={data.tel[0]}
+                  value={data?.tel}
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -109,7 +106,7 @@ const OwnerInfo = ({ data }) => {
                   // helperText="Not More than 200 words"
                   multiline
                   rows={10}
-                  value={data.desc}
+                  value={data?.desc}
                   InputProps={{ readOnly: true }}
                 />
               </Grid>

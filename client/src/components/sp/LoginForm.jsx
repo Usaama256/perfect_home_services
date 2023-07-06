@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 
 // ----------------------------------------------------------------------
 
-export default function LoginForm() {
+const LoginForm = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   return (
@@ -62,4 +62,6 @@ export default function LoginForm() {
       </Button>
     </div>
   );
-}
+};
+
+export default LoginForm;

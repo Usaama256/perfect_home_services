@@ -14,11 +14,7 @@ import {
   Typography,
   Unstable_Grid2 as Grid,
 } from "@mui/material";
-import {
-  AddBusiness,
-  ArrowBackIos,
-  ArrowForwardIos,
-} from "@mui/icons-material";
+import { AddBusiness, ArrowBackIos } from "@mui/icons-material";
 import { useState } from "react";
 import { useEffect } from "react";
 

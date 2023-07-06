@@ -1,15 +1,16 @@
-import { useTheme } from "@mui/material/styles";
-import { Grid, Container, Typography, Card } from "@mui/material";
+import { Grid, Container, Typography } from "@mui/material";
 import SpCompanyProfile from "../../components/sp/account/SpCompanyProfile";
 import EditCompanyInfo from "../../components/sp/account/EditCompanyInfo";
 import SpOwnerProfile from "../../components/sp/account/SpOwnerProfile";
 import { useState } from "react";
 import EditOwnerInfo from "../../components/sp/account/EditOwnerInfo";
+import SpAccountSuspendedPop from "../../components/sp/SpAccountSuspended";
+import { useSelector } from "react-redux";
 
 // ----------------------------------------------------------------------
 const SPInfo = () => {
-  const userActive = false;
-  const theme = useTheme();
+  const { user } = useSelector((state) => state.user);
+  const userActive = user.status === "active";
   const [editMode, setEditMode] = useState({
     company: false,
     owner: false,
@@ -42,41 +43,30 @@ const SPInfo = () => {
         Company Information
       </Typography>
 
-      {userActive === false && (
-        <Card
-          sx={{
-            backgroundColor: "#f6050583",
-            width: "100%",
-            height: "60px",
-            margin: "30px 0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography variant="h4">Activation Pending</Typography>
-        </Card>
-      )}
+      {userActive === false && <SpAccountSuspendedPop />}
 
       <Grid container spacing={3}>
         {!editMode.company && !editMode.owner && (
           <>
             <Grid item xs={12} md={6} lg={6}>
-              <SpCompanyProfile editCompany={() => editModeHandler(1)} />
+              <SpCompanyProfile
+                editCompany={() => editModeHandler(1)}
+                sp={user}
+              />
             </Grid>
             <Grid item xs={12} md={6} lg={6}>
-              <SpOwnerProfile editOwner={() => editModeHandler(0)} />
+              <SpOwnerProfile editOwner={() => editModeHandler(0)} sp={user} />
             </Grid>
           </>
         )}
         {editMode.company && (
           <Grid item xs={12} md={6} lg={12}>
-            <EditCompanyInfo closeEditor={() => closeEditMode()} />
+            <EditCompanyInfo closeEditor={() => closeEditMode()} sp={user} />
           </Grid>
         )}
         {editMode.owner && (
           <Grid item xs={12} md={6} lg={12}>
-            <EditOwnerInfo closeEditor={() => closeEditMode()} />
+            <EditOwnerInfo closeEditor={() => closeEditMode()} sp={user} />
           </Grid>
         )}
       </Grid>

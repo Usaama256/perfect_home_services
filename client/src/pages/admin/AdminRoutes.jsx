@@ -1,8 +1,14 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import Preloader from "../../components/Preloader";
 import SPLayout from "../../components/admin/AdminLayout";
-import { lazyImportRetry } from "../../store/requestMethods";
+import { lazyImportRetry } from "../../store/lazyDynamicImports";
+import { useDispatch } from "react-redux";
+import {
+  fetchServicesAdmin,
+  fetchSPsAdmin,
+  fetchUsersAdmin,
+} from "../../redux/apiCalls";
 // import Profile from "./Profile";
 // import ServiceProvider from "./ServiceProvider";
 // import User from "./User";
@@ -28,6 +34,13 @@ const Settings = lazy(() => lazyImportRetry(() => import("./Settings")));
 const Profile = lazy(() => lazyImportRetry(() => import("./Profile")));
 
 const AdminRoutes = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    fetchSPsAdmin(dispatch);
+    fetchUsersAdmin(dispatch);
+    fetchServicesAdmin(dispatch);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <Routes>
       <Route

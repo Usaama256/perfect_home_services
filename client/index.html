@@ -47,8 +47,13 @@
   <body>
     <div id="root"></div>
     <script>
+      // var scale = "scale(0.75)";
+      // document.body.style.webkitTransform = scale; // Chrome, Opera, Safari
+      // document.body.style.msTransform = scale; // IE 9
+      // document.body.style.transform = scale; // General
       window.addEventListener("scroll", () => {
         const scrollHeight = window.pageYOffset;
+        // const scrollHeight = window.scrolY;
         const navBar = document.getElementById("topNav");
         const navHeight = navBar.getBoundingClientRect().height;
         // console.log(navBar, scrollHeight, navHeight);
@@ -61,7 +66,7 @@
             // console.log("FixNav 0");
           }
         } else {
-          console.log("Nav Failed");
+          // console.log("Nav Failed");
         }
       });
     </script>

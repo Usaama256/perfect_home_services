@@ -13,15 +13,7 @@ import {
 } from "@mui/material";
 // components
 import MenuPopover from "../../components/MenuPopover";
-import { imgAvator } from "../../store/images";
 import { Home, Person, Settings } from "@mui/icons-material";
-
-// ----------------------------------------------------------------------
-const account = {
-  displayName: "Kimuli Jamil",
-  email: "demo@here.cc",
-  photoURL: imgAvator,
-};
 
 const MENU_OPTIONS = [
   {
@@ -43,7 +35,7 @@ const MENU_OPTIONS = [
 
 // ----------------------------------------------------------------------
 
-export default function AccountPopover() {
+export default function AccountPopover({ user, openLogout }) {
   const anchorRef = useRef(null);
 
   const [open, setOpen] = useState(null);
@@ -76,7 +68,10 @@ export default function AccountPopover() {
           }),
         }}
       >
-        <Avatar src={account.photoURL} alt="photoURL" />
+        <Avatar
+          src={user.owner.avator ? user.owner.avator : "null"}
+          alt={user.owner.firstName}
+        />
       </IconButton>
 
       <MenuPopover
@@ -95,10 +90,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {user.owner.avator}
           </Typography>
           <Typography variant="body2" sx={{ color: "text.secondary" }} noWrap>
-            {account.email}
+            {user.owner.email}
           </Typography>
         </Box>
 
@@ -119,7 +114,13 @@ export default function AccountPopover() {
 
         <Divider sx={{ borderStyle: "dashed" }} />
 
-        <MenuItem onClick={handleClose} sx={{ m: 1 }}>
+        <MenuItem
+          onClick={() => {
+            openLogout();
+            handleClose();
+          }}
+          sx={{ m: 1 }}
+        >
           Logout
         </MenuItem>
       </MenuPopover>

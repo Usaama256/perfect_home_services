@@ -14,6 +14,11 @@ import {
 import { AddCard, CameraAlt } from "@mui/icons-material";
 import styled from "styled-components";
 import { useState } from "react";
+import { imgFromLocalToBase64 } from "../../../store/base64ImgConverter";
+import { useDispatch } from "react-redux";
+import { useSnackbar } from "notistack";
+import { myRequest } from "../../../store/requestMethods";
+import { fetchServicesAdmin } from "../../../redux/apiCalls";
 
 const imgCardSx = {
   overflow: "hidden",
@@ -28,24 +33,119 @@ const imgCardSx = {
   width: 320,
 };
 
-const AddService = ({}) => {
-  const [imgs, setImgs] = useState({
-    img1: null,
-    img2: null,
-    img3: null,
-    img4: null,
-    img5: null,
-    img6: null,
+const AddService = () => {
+  const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+  const [isFetching, setIsFetching] = useState(false);
+  const [uploadingImg, setUploadingImg] = useState(false);
+  const [newService, setNewService] = useState({
+    Sname: "",
+    desc: "",
   });
+  const [imgs, setImgs] = useState({
+    one: "",
+    two: "",
+    three: "",
+  });
+
   //Image change handler
-  const uploadHandler = (e) => {
+  const uploadHandler = (e, n) => {
     //console.log(e.target.files);
     if (e.target.files.length !== 0) {
+      setUploadingImg(true);
+      enqueueSnackbar("Please Wait While Uploading Images", {
+        variant: "info",
+      });
+      imgFromLocalToBase64(e.target.files[0]).then((base64Str) => {
+        if (n === 1) {
+          setImgs({ ...imgs, one: base64Str });
+          setUploadingImg(false);
+          enqueueSnackbar("Image 1 Uploaded Successfully", {
+            variant: "success",
+          });
+        } else if (n === 2) {
+          setImgs({ ...imgs, two: base64Str });
+          setUploadingImg(false);
+          enqueueSnackbar("Image 2 Uploaded Successfully", {
+            variant: "success",
+          });
+        } else if (n === 3) {
+          setImgs({ ...imgs, three: base64Str });
+          setUploadingImg(false);
+          enqueueSnackbar("Image 3 Uploaded Successfully", {
+            variant: "success",
+          });
+        }
+      });
     }
     e.target.value = null;
   };
 
-  const resetFields = () => {};
+  const addServiceHandler = async () => {
+    if (uploadingImg === true) {
+      enqueueSnackbar("Please Wait While Uploading Images", {
+        variant: "info",
+      });
+    } else {
+      if (newService.Sname < 2) {
+        enqueueSnackbar("Enter A Valid Service Name", { variant: "error" });
+      } else {
+        try {
+          enqueueSnackbar("Please wait while adding the New Service", {
+            variant: "info",
+          });
+          setIsFetching(true);
+          const res = await myRequest.post(`/admin.api/addService`, {
+            ...newService,
+            imgsArr: [
+              imgs.one ? imgs.one : "",
+              imgs.two ? imgs.two : "",
+              imgs.three ? imgs.three : "",
+            ],
+          });
+          if (res.status === 200) {
+            enqueueSnackbar("Service Added Successfully", {
+              variant: "success",
+            });
+            resetFields();
+            fetchServicesAdmin(dispatch);
+          } else {
+            enqueueSnackbar("Error: Service Not Added", { variant: "error" });
+          }
+        } catch (err) {
+          enqueueSnackbar("Error: Service Not Added", { variant: "error" });
+          enqueueSnackbar(err.response?.data, { variant: "error" });
+          console.log(err);
+          if (err.response) {
+            console.log(err.response, err.message);
+          } else if (err.request) {
+            if (err.request.status) {
+              console.error(err.message, err.request);
+            } else {
+              console.log(err.request, err.message);
+            }
+          } else {
+            console.log(err.message);
+          }
+        } finally {
+          setIsFetching(false);
+        }
+      }
+    }
+  };
+
+  const resetFields = () => {
+    setNewService({
+      Sname: "",
+      desc: "",
+      imgsArr: [],
+    });
+    setImgs({
+      one: "",
+      two: "",
+      three: "",
+    });
+  };
 
   return (
     <Card>
@@ -57,9 +157,12 @@ const AddService = ({}) => {
               <TextField
                 fullWidth
                 label="Service Title"
-                // onChange={() => {}}
                 required
-                // value={SP.title}
+                value={newService.Sname}
+                onChange={(e) =>
+                  setNewService({ ...newService, Sname: e.target.value })
+                }
+                disabled={isFetching}
               />
             </Grid>
             <Grid item xs={12} md={12}>
@@ -69,8 +172,11 @@ const AddService = ({}) => {
                 helperText="Not More than 100 words"
                 multiline
                 rows={4}
-                // onChange={() => {}}
-                // value={SP.desc}
+                value={newService.desc}
+                onChange={(e) =>
+                  setNewService({ ...newService, desc: e.target.value })
+                }
+                disabled={isFetching}
               />
             </Grid>
             <Grid container spacing={1} xs={12} md={12} columns={12}>
@@ -82,9 +188,9 @@ const AddService = ({}) => {
                   gap={1}
                 >
                   <Card style={imgCardSx}>
-                    {imgs.img1 && (
+                    {imgs.one && (
                       <img
-                        src={imgs.img1}
+                        src={imgs.one}
                         alt="img"
                         style={{
                           width: "100%",
@@ -100,13 +206,16 @@ const AddService = ({}) => {
                     }}
                     type="file"
                     id="img1Upload"
-                    disabled={false}
+                    disabled={isFetching || uploadingImg}
                     name="imageUpload"
                     accept="image/*"
-                    onChange={uploadHandler}
+                    onChange={(e) => uploadHandler(e, 1)}
                   />
-                  <label htmlFor="img1Upload">
-                    <UploadBtn>
+                  <label
+                    htmlFor="img1Upload"
+                    disabled={isFetching || uploadingImg}
+                  >
+                    <UploadBtn disabled={isFetching || uploadingImg}>
                       Upload Image One
                       <SvgIcon size="large">
                         <CameraAlt />
@@ -123,9 +232,9 @@ const AddService = ({}) => {
                   gap={1}
                 >
                   <Card style={imgCardSx}>
-                    {imgs.img2 && (
+                    {imgs.two && (
                       <img
-                        src={imgs.img2}
+                        src={imgs.two}
                         alt="img"
                         style={{
                           width: "100%",
@@ -141,13 +250,24 @@ const AddService = ({}) => {
                     }}
                     type="file"
                     id="img2Upload"
-                    disabled={false}
+                    disabled={
+                      isFetching || uploadingImg || imgs.one.length === 0
+                    }
                     name="imageUpload"
                     accept="image/*"
-                    onChange={uploadHandler}
+                    onChange={(e) => uploadHandler(e, 2)}
                   />
-                  <label htmlFor="img2Upload">
-                    <UploadBtn>
+                  <label
+                    htmlFor="img2Upload"
+                    disabled={
+                      isFetching || uploadingImg || imgs.one.length === 0
+                    }
+                  >
+                    <UploadBtn
+                      disabled={
+                        isFetching || uploadingImg || imgs.one.length === 0
+                      }
+                    >
                       Upload Image Two
                       <SvgIcon size="large">
                         <CameraAlt />
@@ -164,9 +284,9 @@ const AddService = ({}) => {
                   gap={1}
                 >
                   <Card style={imgCardSx}>
-                    {imgs.img3 && (
+                    {imgs.three && (
                       <img
-                        src={imgs.img3}
+                        src={imgs.three}
                         alt="img"
                         style={{
                           width: "100%",
@@ -182,13 +302,24 @@ const AddService = ({}) => {
                     }}
                     type="file"
                     id="img3Upload"
-                    disabled={false}
+                    disabled={
+                      isFetching || uploadingImg || imgs.two.length === 0
+                    }
                     name="imageUpload"
                     accept="image/*"
-                    onChange={uploadHandler}
+                    onChange={(e) => uploadHandler(e, 3)}
                   />
-                  <label htmlFor="img3Upload">
-                    <UploadBtn>
+                  <label
+                    htmlFor="img3Upload"
+                    disabled={
+                      isFetching || uploadingImg || imgs.two.length === 0
+                    }
+                  >
+                    <UploadBtn
+                      disabled={
+                        isFetching || uploadingImg || imgs.two.length === 0
+                      }
+                    >
                       Upload Image Three
                       <SvgIcon size="large">
                         <CameraAlt />
@@ -197,7 +328,7 @@ const AddService = ({}) => {
                   </label>
                 </Stack>
               </Grid>
-              <Grid item xs={12} md={4} columns={4}>
+              {/* <Grid item xs={12} md={4} columns={4}>
                 <Stack
                   direction="column"
                   alignItems="center"
@@ -319,14 +450,19 @@ const AddService = ({}) => {
                     </UploadBtn>
                   </label>
                 </Stack>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Grid>
         </Box>
       </CardContent>
       <Divider />
       <CardActions sx={{ justifyContent: "flex-end" }}>
-        <Button variant="outlined" color="secondary">
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => resetFields()}
+          disabled={isFetching}
+        >
           Reset Fields
         </Button>
         <Button
@@ -337,6 +473,8 @@ const AddService = ({}) => {
               <AddCard />
             </SvgIcon>
           }
+          onClick={() => addServiceHandler()}
+          disabled={isFetching}
         >
           Add Service
         </Button>

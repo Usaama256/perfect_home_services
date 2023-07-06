@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { logo_g } from "../store/images";
+// import { logo_g } from "../store/images";
 import ProgressiveImage from "./ProgressiveImage";
 
 const CompanyCard = ({ id, title, logo, desc, rating, location, sx }) => {
@@ -51,7 +51,7 @@ const CompanyCard = ({ id, title, logo, desc, rating, location, sx }) => {
           >
             <ProgressiveImage
               src={logo}
-              placeholder={logo_g}
+              // placeholder={logo_g}
               width={100}
               style={{ cursor: "pointer" }}
               onClick={() => navigate(`/services/provider/${id}`)}

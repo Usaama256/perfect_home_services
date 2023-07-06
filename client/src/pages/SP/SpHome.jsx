@@ -1,7 +1,5 @@
-import { useTheme } from "@mui/material/styles";
-import { Grid, Container, Typography, Card } from "@mui/material";
+import { Grid, Container, Typography } from "@mui/material";
 import AppWidgetSummary from "../../components/sp/home/AppWidgetSummary";
-import AppOrderTimeline from "../../components/sp/home/AppOrderTimeline";
 import {
   ContactPhone,
   Reviews,
@@ -9,52 +7,42 @@ import {
   StarBorder,
 } from "@mui/icons-material";
 import SpContactSummary from "../../components/sp/home/SpContactSummary";
-import { imgAvator } from "../../store/images";
-import { dummyClients } from "../../store/dummies";
 import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import SpAccountSuspendedPop from "../../components/sp/SpAccountSuspended";
+import { fetchSPcallsSP } from "../../redux/apiCalls";
 
 // ----------------------------------------------------------------------
 const SpHome = () => {
-  const userActive = false;
-  const theme = useTheme();
+  const { user } = useSelector((state) => state.user);
+  const { comments, callings } = useSelector((state) => state.spData);
+  const dispatch = useDispatch();
+  const userActive = user.status === "active";
 
   useEffect(() => {
+    fetchSPcallsSP(user.id, dispatch);
     window.scrollTo(0, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
         Dashboard
       </Typography>
-
-      {userActive === false && (
-        <Card
-          sx={{
-            backgroundColor: "#f6050583",
-            width: "100%",
-            height: "60px",
-            margin: "30px 0",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography variant="h4">Activation Pending</Typography>
-        </Card>
-      )}
+      {userActive === false && <SpAccountSuspendedPop />}
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Weekly Sales"
-            total={714000}
+            total={100}
             icon={<StackedLineChart />}
           />
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Reviews"
-            total={1352831}
+            title="User Comments"
+            total={comments ? comments.length : 0}
             // color="info"
             icon={<Reviews />}
           />
@@ -62,8 +50,8 @@ const SpHome = () => {
 
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Contact Attempts"
-            total={900}
+            title="User Call Requests"
+            total={callings ? callings.length : 0}
             // color="warning"
             icon={<ContactPhone />}
           />
@@ -72,33 +60,15 @@ const SpHome = () => {
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Ratings"
-            total={3.4}
+            total={parseFloat(user.rating.value)}
             // color="error"
             icon={<StarBorder />}
           />
         </Grid>
 
         <Grid item xs={12} md={12} lg={12}>
-          <SpContactSummary users={dummyClients} />
+          <SpContactSummary calls={callings} userActive={userActive} />
         </Grid>
-
-        {/* <Grid item xs={12} md={6} lg={4} >
-          <AppOrderTimeline
-            title="Order Timeline"
-            list={[...Array(5)].map((_, index) => ({
-              id: `13242Fq34d_${index}`,
-              title: [
-                "1983, orders, $4220",
-                "12 Invoices have been paid",
-                "Order #37745 from September",
-                "New order placed #XF-2356",
-                "New order placed #XF-2346",
-              ][index],
-              type: `order${index + 1}`,
-              time: new Date(),
-            }))}
-          />
-        </Grid> */}
       </Grid>
     </Container>
   );

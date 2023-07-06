@@ -3,9 +3,6 @@ import { useState } from "react";
 import styled from "styled-components";
 import GenLayout from "../components/GenLayout";
 import { useLocation, useNavigate } from "react-router-dom";
-import { servicesArr } from "../store/services";
-import Slider from "../components/Slider";
-import { dummySPs } from "../store/dummies";
 import CompanyCard from "../components/CompanyCard";
 import { Tooltip } from "@mui/material";
 import { myRequest } from "../store/requestMethods";
@@ -17,28 +14,60 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import { useDispatch, useSelector } from "react-redux";
+import { LoadingPlaceholder2 } from "../components/LoadingPlaceholder";
+import { fetchSPs } from "../redux/apiCalls";
 
 const ServiceProviders = () => {
-  // window.scrollTo(0, 0);
+  const { services } = useSelector((state) => state.services);
+  const { sPs, isFetching } = useSelector((state) => state.sPs);
   const sId = useLocation().pathname.split("/")[2];
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
-  const [currentSercvice, setCurrentService] = useState({});
+  const [currentService, setCurrentService] = useState(null);
+  const [displayedSPs, setDisplayedSPs] = useState(null);
   const [searchTxt, setSearchTxt] = useState("");
   const [searchMode, setSearchMode] = useState(false);
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState(null);
 
+  //Setting SPs
   useEffect(() => {
-    const index = servicesArr.findIndex((item) => item.id === sId);
-    if (index === -1) {
-      navigate("/404");
-    } else {
-      setCurrentService(servicesArr[index]);
+    if (sId && sPs) {
+      const tempArr = [];
+      sPs.forEach((i, n) => {
+        if (parseInt(i.sId, 10) === parseInt(sId, 10)) {
+          return tempArr.push(i);
+        } else {
+          return;
+        }
+      });
+      // console.log(tempArr, sId, sPs);
+      setDisplayedSPs(tempArr);
     }
+    fetchSPs(dispatch, true, sPs);
 
+    return;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sId]);
+  }, [sId, sPs]);
+
+  //Setting Service
+  useEffect(() => {
+    if (sId && services) {
+      // console.log(services, sId);
+      const index = services.findIndex(
+        (item) => parseInt(item.id, 10) === parseInt(sId, 10)
+      );
+      if (index === -1) {
+        navigate("/404");
+      } else {
+        // console.log(services[index]);
+        setCurrentService(services[index]);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sId, services]);
 
   const searchHandler = async (txt) => {
     const ctrl = new AbortController();
@@ -109,7 +138,7 @@ const ServiceProviders = () => {
   };
 
   return (
-    <GenLayout title={currentSercvice?.name} nav={true}>
+    <GenLayout title={currentService?.name} nav={true}>
       {/* <SlideContainer>
         <Slider
           images={currentSercvice?.imgs}
@@ -121,7 +150,7 @@ const ServiceProviders = () => {
         />
       </SlideContainer> */}
       <SPsSection>
-        <h1 className="title">{currentSercvice?.name}</h1>
+        <h1 className="title">{currentService ? currentService.name : ""}</h1>
         <div className="desc">Check Out Our Trusted Service Providers</div>
         <div className="desc-extra">
           "We care for your home like it's our own"
@@ -171,10 +200,29 @@ const ServiceProviders = () => {
           </FormControl>
         </Search>
 
+        {!displayedSPs && !isFetching && (
+          <h2 style={{ margin: "20px 0px" }}>No Service Providers Yet</h2>
+        )}
+
         <div className="wrapper">
-          {[...dummySPs, ...dummySPs].map((item, index) => {
-            return <CompanyCard {...item} key={index} />;
-          })}
+          {displayedSPs ? (
+            displayedSPs?.map((item, index) => {
+              return <CompanyCard {...item} key={index} />;
+            })
+          ) : (
+            <>
+              {isFetching && (
+                <>
+                  <LoadingPlaceholder2 />
+                  <LoadingPlaceholder2 />
+                  <LoadingPlaceholder2 />
+                  <LoadingPlaceholder2 />
+                  <LoadingPlaceholder2 />
+                  <LoadingPlaceholder2 />
+                </>
+              )}
+            </>
+          )}
         </div>
       </SPsSection>
     </GenLayout>

@@ -1,10 +1,11 @@
+import { Link, Checkbox, Stack, Typography } from "@mui/material";
 import { ArrowBack, Facebook, Google, Twitter } from "@mui/icons-material";
 import { Tooltip } from "@mui/material";
 import { useSnackbar } from "notistack";
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { signInUser, signupUser } from "../redux/apiCalls";
+import { adminSignin, cSignIn, cSignup } from "../redux/apiCalls";
 import { useDispatch, useSelector } from "react-redux";
 
 const Auth = ({ type }) => {
@@ -13,50 +14,64 @@ const Auth = ({ type }) => {
   const fetching = useSelector((state) => state.user.isFetching);
   const { enqueueSnackbar } = useSnackbar();
   const [addContClass, setAddContClass] = useState(null);
-  const [signUpData, setSignUpData] = useState({
-    user_email: "",
-    phoneNo: "",
-    user_address: "",
-    user_password: "",
+  const [clientSignUpData, setClientSignUpData] = useState({
+    email: "",
+    phone: "",
+    location: "",
+    pass: "",
     pass2: "",
+    profilePic: "",
   });
   const [signInData, setSignInData] = useState({
-    user_email: "",
-    user_password: "",
+    email: "",
+    pass: "",
   });
+  const [userAgree, setUserAgree] = useState(false);
 
   const onSignUp = (e) => {
     e.preventDefault();
     if (
-      (signUpData.user_address === "",
-      signUpData.phoneNo === "" ||
-        signUpData.user_address === "" ||
-        signUpData.user_password === "" ||
-        signUpData.pass2 === "")
+      clientSignUpData.location.length < 1 ||
+      clientSignUpData.phone.length < 1 ||
+      clientSignUpData.location === "" ||
+      clientSignUpData.pass.length < 1 ||
+      clientSignUpData.pass2.length < 1
     ) {
       enqueueSnackbar("Enter All Fields", { variant: "error" });
     } else {
-      if (signUpData.user_password !== signUpData.pass2) {
+      if (clientSignUpData.pass !== clientSignUpData.pass2) {
         enqueueSnackbar("Make Sure Passwords match", { variant: "error" });
       } else {
-        enqueueSnackbar("Wait A Moment", { variant: "info" });
-        signupUser(signUpData, dispatch, navigate, enqueueSnackbar);
+        if (userAgree === false) {
+          enqueueSnackbar(
+            "You must agree to our terms and conditions to continue",
+            { variant: "warning" }
+          );
+        } else {
+          enqueueSnackbar("Wait A Moment", { variant: "info" });
+          // console.log(clientSignUpData);
+          cSignup(clientSignUpData, dispatch, navigate, enqueueSnackbar);
+        }
       }
     }
   };
 
   const onSignIn = (e) => {
     e.preventDefault();
-
     if (type === "admin") {
-      navigate("/admin/dash/home");
-    }
-
-    if (signInData.user_address === "" || signInData.user_password === "") {
-      enqueueSnackbar("Enter All Fields", { variant: "error" });
-    } else {
-      enqueueSnackbar("Wait A Moment", { variant: "info" });
-      signInUser(signInData, dispatch, navigate, enqueueSnackbar);
+      if (signInData.email === "" || signInData.pass === "") {
+        enqueueSnackbar("Enter All Fields", { variant: "error" });
+      } else {
+        enqueueSnackbar("Wait A Moment", { variant: "info" });
+        adminSignin(signInData, dispatch, navigate, enqueueSnackbar);
+      }
+    } else if (type === "user") {
+      if (signInData.email === "" || signInData.pass === "") {
+        enqueueSnackbar("Enter All Fields", { variant: "error" });
+      } else {
+        enqueueSnackbar("Wait A Moment", { variant: "info" });
+        cSignIn(signInData, "email", dispatch, navigate, enqueueSnackbar);
+      }
     }
   };
 
@@ -65,13 +80,13 @@ const Auth = ({ type }) => {
       <div className={`container ${addContClass}`} id="container">
         <div className={`arrow-back ${addContClass && "arrow-back-white"}`}>
           <Tooltip title={"Back"} arrow>
-            <ArrowBack onClick={() => navigate(-1)} />
+            <ArrowBack onClick={() => navigate("/")} />
           </Tooltip>
         </div>
         <div className="form-container sign-up-container">
           <form action="#">
-            <h1>Create Account</h1>
-            <div className="social-container">
+            <h1>Create User Account</h1>
+            {/* <div className="social-container">
               <Link to={() => false} className="social">
                 <Google />
               </Link>
@@ -81,54 +96,100 @@ const Auth = ({ type }) => {
               <Link to={() => false} className="social">
                 <Twitter />
               </Link>
-            </div>
-            <span>or use your email for registration</span>
+            </div> */}
+            <span>Enter Your Details</span>
             <input
               type="email"
               placeholder="Email"
-              value={signUpData.user_email}
+              value={clientSignUpData.email}
               onChange={(e) =>
-                setSignUpData({ ...signUpData, user_email: e.target.value })
+                setClientSignUpData({
+                  ...clientSignUpData,
+                  email: e.target.value,
+                })
               }
               disabled={fetching}
             />
             <input
               type="text"
               placeholder="Phone Number"
-              value={signUpData.phoneNo}
+              value={clientSignUpData.phone}
               onChange={(e) =>
-                setSignUpData({ ...signUpData, phoneNo: e.target.value })
+                setClientSignUpData({
+                  ...clientSignUpData,
+                  phone: e.target.value,
+                })
               }
               disabled={fetching}
             />
             <input
               type="text"
-              placeholder="Address"
-              value={signUpData.user_address}
+              placeholder="Location"
+              value={clientSignUpData.location}
               onChange={(e) =>
-                setSignUpData({ ...signUpData, user_address: e.target.value })
+                setClientSignUpData({
+                  ...clientSignUpData,
+                  location: e.target.value,
+                })
               }
               disabled={fetching}
             />
             <input
               type="password"
               placeholder="Password"
-              value={signUpData.user_password}
+              value={clientSignUpData.pass}
               onChange={(e) =>
-                setSignUpData({ ...signUpData, user_password: e.target.value })
+                setClientSignUpData({
+                  ...clientSignUpData,
+                  pass: e.target.value,
+                })
               }
               disabled={fetching}
             />
             <input
               type="password"
               placeholder="Re-type Password"
-              value={signUpData.pass2}
+              value={clientSignUpData.pass2}
               onChange={(e) =>
-                setSignUpData({ ...signUpData, pass2: e.target.value })
+                setClientSignUpData({
+                  ...clientSignUpData,
+                  pass2: e.target.value,
+                })
               }
               disabled={fetching}
             />
-            <button onClick={onSignUp} disabled={fetching}>
+            <Stack
+              width="100%"
+              direction="row"
+              justifyContent=""
+              alignItems="center"
+              spacing={3}
+              padding="10px 0px"
+            >
+              <Checkbox
+                checked={userAgree}
+                onChange={() => setUserAgree(!userAgree)}
+              />
+              <Typography
+                onClick={() => setUserAgree(!userAgree)}
+                sx={{
+                  cursor: "pointer",
+                  margin: "0px !important",
+                  textAlign: "left",
+                }}
+              >
+                I agree to the{" "}
+                <Link
+                  variant="subtitle1"
+                  component={RouterLink}
+                  to="#"
+                  sx={{ color: "#3f42ff", fontWeight: 700 }}
+                >
+                  PerfectHome Services terms and conditions
+                </Link>
+              </Typography>
+            </Stack>
+            <button onClick={onSignUp} disabled={!userAgree || fetching}>
               Sign Up
             </button>
           </form>
@@ -137,36 +198,36 @@ const Auth = ({ type }) => {
           <form action="#">
             <h1>{type === "admin" ? "Admin Login" : "User Login"}</h1>
             <div className="social-container">
-              <Link to={() => false} className="social">
+              <RouterLink to={() => false} className="social">
                 <Google />
-              </Link>
-              <Link to={() => false} className="social">
+              </RouterLink>
+              <RouterLink to={() => false} className="social">
                 <Facebook />
-              </Link>
-              <Link to={() => false} className="social">
+              </RouterLink>
+              <RouterLink to={() => false} className="social">
                 <Twitter />
-              </Link>
+              </RouterLink>
             </div>
             <span>or use your account</span>
             <input
               type="email"
               placeholder="Email"
-              value={signInData.user_email}
+              value={signInData.email}
               onChange={(e) =>
-                setSignInData({ ...signInData, user_email: e.target.value })
+                setSignInData({ ...signInData, email: e.target.value })
               }
               disabled={fetching}
             />
             <input
               type="password"
               placeholder="Password"
-              value={signInData.user_password}
+              value={signInData.pass}
               onChange={(e) =>
-                setSignInData({ ...signInData, user_password: e.target.value })
+                setSignInData({ ...signInData, pass: e.target.value })
               }
               disabled={fetching}
             />
-            <Link to={() => false}>Forgot your password?</Link>
+            <RouterLink to={() => false}>Forgot your password?</RouterLink>
             <button onClick={onSignIn} disabled={fetching}>
               Sign In
             </button>
@@ -282,6 +343,12 @@ const Layout = styled.div`
     cursor: pointer;
   }
 
+  button:disabled {
+    border: 1px solid #aa0000;
+    background-color: #c9c9c9;
+    color: #101010;
+    cursor: not-allowed;
+  }
   button:active {
     transform: scale(0.95);
   }
@@ -301,7 +368,7 @@ const Layout = styled.div`
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding: 0 50px;
+    padding: 0 10px;
     height: 100%;
     text-align: center;
   }

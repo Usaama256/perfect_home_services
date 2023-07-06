@@ -14,6 +14,11 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Card, Stack, Tooltip } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
+import { useSnackbar } from "notistack";
+import { myRequest } from "../../../store/requestMethods";
+import { fetchSpProductsSP } from "../../../redux/apiCalls";
+import { useDispatch } from "react-redux";
+import PdtDeleteDialog from "./PdtDeleteDialog";
 
 const imgCardSx = {
   overflow: "hidden",
@@ -28,11 +33,21 @@ const imgCardSx = {
   width: 320,
 };
 
-const Row = ({ row }) => {
+const Row = ({ row, isFetching, deletePdt }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [open, setOpen] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState(false);
 
   return (
     <React.Fragment>
+      {deleteDialog && (
+        <PdtDeleteDialog
+          open={deleteDialog}
+          setOpen={setDeleteDialog}
+          data={row}
+          deleteFn={deletePdt}
+        />
+      )}
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell>
           <IconButton
@@ -60,13 +75,27 @@ const Row = ({ row }) => {
         </TableCell>
         <TableCell align="right">
           <Tooltip title="Edit Product/Service" arrow>
-            <IconButton color="primary" size="large">
+            <IconButton
+              color="primary"
+              size="large"
+              disabled={isFetching}
+              onClick={() =>
+                enqueueSnackbar("Our Engineers Are Working On It", {
+                  variant: "info",
+                })
+              }
+            >
               <Edit />
             </IconButton>
           </Tooltip>
           &ensp;&ensp;
           <Tooltip title="Delete Product/Service" arrow>
-            <IconButton color="error" size="large">
+            <IconButton
+              color="error"
+              size="large"
+              disabled={isFetching}
+              onClick={() => setDeleteDialog(true)}
+            >
               <Delete />
             </IconButton>
           </Tooltip>
@@ -89,69 +118,32 @@ const Row = ({ row }) => {
                   spacing={3}
                   sx={{ width: "100%" }}
                 >
-                  <Stack
-                    direction="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    spacing={3}
-                  >
-                    <Card style={imgCardSx}>
-                      {row.img1 && (
-                        <img
-                          src={row.img1}
-                          alt="img"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      )}
-                    </Card>
-                    <Typography variant="body1">Image One</Typography>
-                  </Stack>
-                  <Stack
-                    direction="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    spacing={3}
-                  >
-                    <Card style={imgCardSx}>
-                      {row.img2 && (
-                        <img
-                          src={row.img2}
-                          alt="img"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      )}
-                    </Card>
-                    <Typography variant="body1">Image Two</Typography>
-                  </Stack>
-                  <Stack
-                    direction="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    spacing={3}
-                  >
-                    <Card style={imgCardSx}>
-                      {row.img3 && (
-                        <img
-                          src={row.img3}
-                          alt="img"
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "cover",
-                          }}
-                        />
-                      )}
-                    </Card>
-                    <Typography variant="body1">Image Three</Typography>
-                  </Stack>
+                  {row.images?.map((i, n) => {
+                    return (
+                      <Stack
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        spacing={3}
+                        key={n}
+                      >
+                        <Card style={imgCardSx}>
+                          {i && (
+                            <img
+                              src={i}
+                              alt="img"
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          )}
+                        </Card>
+                        <Typography variant="body1">Image {n + 1}</Typography>
+                      </Stack>
+                    );
+                  })}
                 </Stack>
                 <br />
               </Table>
@@ -163,7 +155,44 @@ const Row = ({ row }) => {
   );
 };
 
-const ProductsTb = ({ products }) => {
+const ProductsTb = ({ products, SPid }) => {
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useDispatch();
+  const [isFetching, setIsFetching] = useState(false);
+
+  const deletePdtHandler = async (id) => {
+    try {
+      enqueueSnackbar("Please Wait While Deleting Product", {
+        variant: "info",
+      });
+      setIsFetching(true);
+      const res = await myRequest.get(`/sp.api/deletePdt/${SPid}/${id}`);
+      if (res.status === 200) {
+        enqueueSnackbar("Product Deleted Successfully", { variant: "success" });
+        fetchSpProductsSP(dispatch);
+      } else {
+        enqueueSnackbar("Error: Deleting Failed", { variant: "error" });
+      }
+    } catch (err) {
+      enqueueSnackbar("Error: Deleting Failed", { variant: "error" });
+      enqueueSnackbar(err.response?.data, { variant: "error" });
+      console.log(err);
+      if (err.response) {
+        console.log(err.response, err.message);
+      } else if (err.request) {
+        if (err.request.status) {
+          console.error(err.message, err.request);
+        } else {
+          console.log(err.request, err.message);
+        }
+      } else {
+        console.log(err.message);
+      }
+    } finally {
+      setIsFetching(false);
+    }
+  };
+
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
@@ -178,7 +207,12 @@ const ProductsTb = ({ products }) => {
         </TableHead>
         <TableBody>
           {products?.map((row, n) => (
-            <Row key={n} row={row} />
+            <Row
+              key={n}
+              row={row}
+              isFetching={isFetching}
+              deletePdt={deletePdtHandler}
+            />
           ))}
         </TableBody>
       </Table>

@@ -1,18 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import { styled } from "@mui/material/styles";
-import {
-  Box,
-  Link,
-  Drawer,
-  Typography,
-  Avatar,
-  Stack,
-  Button,
-} from "@mui/material";
+import { Box, Link, Drawer, Typography, Stack, Button } from "@mui/material";
 import Scrollbar from "../../components/Scrollbar";
 // import NavSection from "../../components/NavSection";
-import { imgAvator, logo_g } from "../../store/images";
+import { logo_g } from "../../store/images";
 import useResponsive from "../../store/hooks/useRsponsive";
 import {
   Analytics,
@@ -20,16 +12,11 @@ import {
   Inventory2,
   Logout,
   PeopleAlt,
-  Settings,
 } from "@mui/icons-material";
 import NavSection from "./NavSection";
-
-const account = {
-  displayName: "Kimuli Jamil",
-  role: "Manager",
-  email: "demo@here.cc",
-  photoURL: imgAvator,
-};
+import { useSelector } from "react-redux";
+import BackgroundLetterAvatars from "../BackgroundLetterAvatars";
+import LogoutConfirmDialog from "../LogoutConfirmDialog";
 
 const navConfig = [
   {
@@ -59,25 +46,10 @@ const navConfig = [
   // },
 ];
 
-const DRAWER_WIDTH = 280;
-
-const RootStyle = styled("div")(({ theme }) => ({
-  [theme.breakpoints.up("lg")]: {
-    flexShrink: 0,
-    width: DRAWER_WIDTH,
-  },
-}));
-
-const AccountStyle = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  padding: theme.spacing(2, 2.5),
-  borderRadius: Number(theme.shape.borderRadius) * 1.5,
-  backgroundColor: theme.palette.grey[500_12],
-}));
-
 const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
+  const { user } = useSelector((state) => state.user);
   const { pathname } = useLocation();
+  const [openLogout, setOpenLogout] = useState(false);
 
   const isDesktop = useResponsive("up", "lg");
 
@@ -99,6 +71,9 @@ const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
         },
       }}
     >
+      {openLogout && (
+        <LogoutConfirmDialog open={openLogout} setOpen={setOpenLogout} />
+      )}
       <Box sx={{ px: 2.5, py: 3, display: "inline-flex" }}>
         <img src={logo_g} alt="alt" width="100%" />
       </Box>
@@ -106,13 +81,15 @@ const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
       <Box sx={{ mb: 5, mx: 2.5 }}>
         <Link underline="none" component={RouterLink} to="/admin/dash/profile">
           <AccountStyle>
-            <Avatar src={account.photoURL} alt="photoURL" />
+            <BackgroundLetterAvatars
+              name={`${user.firstName} ${user.lastName}`}
+            />
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: "text.primary" }}>
-                {account.displayName}
+                {user.firstName} {user.lastName}
               </Typography>
               <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                {account.role}
+                {`Admin`}
               </Typography>
             </Box>
           </AccountStyle>
@@ -129,7 +106,12 @@ const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
           spacing={3}
           sx={{ pt: 5, borderRadius: 2, position: "relative" }}
         >
-          <Button variant="outlined" color="primary" startIcon={<Logout />}>
+          <Button
+            variant="outlined"
+            color="primary"
+            startIcon={<Logout />}
+            onClick={() => setOpenLogout(true)}
+          >
             Log Out
           </Button>
         </Stack>
@@ -169,5 +151,22 @@ const DashboardSidebar = ({ isOpenSidebar, onCloseSidebar }) => {
     </RootStyle>
   );
 };
+
+const DRAWER_WIDTH = 280;
+
+const RootStyle = styled("div")(({ theme }) => ({
+  [theme.breakpoints.up("lg")]: {
+    flexShrink: 0,
+    width: DRAWER_WIDTH,
+  },
+}));
+
+const AccountStyle = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  padding: theme.spacing(2, 2.5),
+  borderRadius: Number(theme.shape.borderRadius) * 1.5,
+  backgroundColor: theme.palette.grey[500_12],
+}));
 
 export default DashboardSidebar;

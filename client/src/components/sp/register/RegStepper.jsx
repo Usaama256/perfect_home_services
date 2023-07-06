@@ -10,6 +10,14 @@ import RegOwnerInfo from "./RegOwnerInfo";
 import RegCompanyInfo from "./RegCompanyInfo";
 import RegAgreements from "./RegAgreements";
 import RegSecurity from "./RegSecurity";
+import { useSnackbar } from "notistack";
+import {
+  validateEmail,
+  validatePhoneNumber1,
+} from "../../../store/otherMethods";
+import { SPsignup } from "../../../redux/apiCalls";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const steps = [
   "Owner's Info",
@@ -19,6 +27,32 @@ const steps = [
 ];
 
 const RegStepper = () => {
+  const { isFetching } = useSelector((state) => state.user);
+  const { enqueueSnackbar } = useSnackbar();
+  const [spOwner, setSPowner] = useState({
+    position: "",
+    firstName: "",
+    lastName: "",
+    location: "",
+    email: "",
+    tel: "",
+    desc: "",
+    avator: "",
+  });
+  const [spInfo, setSpInfo] = useState({
+    email: "",
+    title: "",
+    tel: "",
+    location: "",
+    desc: "",
+    Sid: "",
+    logo: "",
+  });
+  const [securityInfo, setSecurityInfo] = useState({
+    email: spInfo.email,
+    pass: "",
+    pass2: "",
+  });
   const [agreements, setAgreements] = useState({
     age: false,
     TCs: false,
@@ -26,7 +60,13 @@ const RegStepper = () => {
   const tabs = [
     {
       title: "Owner's Info",
-      element: <RegOwnerInfo onNext={() => handleNext()} />,
+      element: (
+        <RegOwnerInfo
+          onNext={() => handleNext()}
+          spOwner={spOwner}
+          setSPowner={setSPowner}
+        />
+      ),
     },
     {
       title: "Company Info",
@@ -34,6 +74,8 @@ const RegStepper = () => {
         <RegCompanyInfo
           onBack={() => handleBack()}
           onNext={() => handleNext()}
+          spInfo={spInfo}
+          setSpInfo={setSpInfo}
         />
       ),
     },
@@ -41,7 +83,12 @@ const RegStepper = () => {
     {
       title: "Profile Security",
       element: (
-        <RegSecurity onBack={() => handleBack()} onNext={() => handleNext()} />
+        <RegSecurity
+          onBack={() => handleBack()}
+          onNext={() => handleNext()}
+          securityInfo={{ ...securityInfo, email: spInfo.email }}
+          setSecurityInfo={setSecurityInfo}
+        />
       ),
     },
     {
@@ -56,6 +103,8 @@ const RegStepper = () => {
       ),
     },
   ];
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [skipped, setSkipped] = useState(new Set());
   const [activeTab, setActiveTab] = useState(tabs[0]);
@@ -66,6 +115,7 @@ const RegStepper = () => {
     } else {
       return;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeStep]);
 
   const isStepOptional = (step) => {
@@ -106,8 +156,95 @@ const RegStepper = () => {
   //   });
   // };
 
-  const handleReset = () => {
+  const resetHandler = () => {
     setActiveStep(0);
+  };
+
+  const spRegisterHandler = () => {
+    const SP = {
+      ...spInfo,
+      pass: securityInfo.pass,
+      pass2: securityInfo.pass2,
+      owner: {
+        ...spOwner,
+      },
+    };
+
+    if (
+      SP.email?.length > 6 &&
+      SP.title?.length > 2 &&
+      SP.location?.length > 2 &&
+      SP.tel?.length > 9 &&
+      `${SP.Sid}`?.length > 0 &&
+      SP.desc?.length > 10
+    ) {
+      if (validateEmail(SP.email)) {
+        if (validatePhoneNumber1(SP.tel)) {
+          if (
+            // SP.owner.position?.length > 1 &&
+            SP.owner.firstName?.length > 1 &&
+            SP.owner.lastName?.length > 1 &&
+            SP.owner.location?.length > 2 &&
+            SP.owner.email?.length > 6 &&
+            SP.owner.tel?.length > 9 &&
+            SP.owner.desc?.length > 10
+          ) {
+            if (validateEmail(SP.owner.email)) {
+              if (validatePhoneNumber1(SP.owner.tel)) {
+                if (SP.pass !== SP.pass2) {
+                  enqueueSnackbar("Review your password", {
+                    variant: "warning",
+                  });
+                } else {
+                  if (SP.pass.length < 8 && SP.pass2.length < 8) {
+                    enqueueSnackbar(
+                      "Passwords Must Be At Least 8 Characters Long",
+                      {
+                        variant: "warning",
+                      }
+                    );
+                  } else {
+                    if (agreements.TCs === false || agreements.age === false) {
+                      enqueueSnackbar(
+                        "Make sure you agree on the terms and conditions",
+                        {
+                          variant: "warning",
+                        }
+                      );
+                    } else {
+                      ////////Signing up sp
+                      SPsignup(SP, dispatch, navigate, enqueueSnackbar);
+                    }
+                  }
+                }
+              } else {
+                enqueueSnackbar("Review onwer phone number", {
+                  variant: "error",
+                });
+              }
+            } else {
+              enqueueSnackbar("Review owner email address", {
+                variant: "error",
+              });
+            }
+          } else {
+            enqueueSnackbar("Review Owner information", {
+              variant: "error",
+            });
+          }
+        } else {
+          enqueueSnackbar("Review your company phone number", {
+            variant: "error",
+          });
+        }
+      } else {
+        enqueueSnackbar("Review your company email address", {
+          variant: "error",
+        });
+      }
+    } else {
+      enqueueSnackbar("Review your company information", { variant: "error" });
+    }
   };
 
   return (
@@ -145,9 +282,29 @@ const RegStepper = () => {
           <Typography sx={{ mt: 2, mb: 1 }}>
             All Steps Completed Successfully
           </Typography>
-          <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-            <Box sx={{ flex: "1 1 auto" }} />
-            <Button onClick={handleReset} color="success" variant="contained">
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              pt: 2,
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Button
+              onClick={() => resetHandler()}
+              color="secondary"
+              variant="outlined"
+              disabled={isFetching}
+            >
+              Review Details
+            </Button>
+            <Button
+              onClick={() => spRegisterHandler()}
+              color="success"
+              variant="contained"
+              disabled={isFetching}
+            >
               Submit
             </Button>
           </Box>

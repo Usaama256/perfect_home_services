@@ -9,45 +9,127 @@ import {
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
-import { dummyReviews, dummySPs, ownerSample } from "../../../store/dummies";
-import { servicesArr } from "../../../store/services";
 import { ArrowBackIos } from "@material-ui/icons";
 import OwnerInfo from "./OwnerInfo";
 import CompanyInfo from "./CompanyInfo";
 import ProductsTb from "./ProductsTb";
 import ReviewsTb from "./ReviewsTb";
+import { myRequest } from "../../../store/requestMethods";
 
 // ----------------------------------------------------------------------
 const ServiceProvider = () => {
-  const spId = useLocation().pathname.split("/")[4];
+  const SPid = parseInt(useLocation().pathname.split("/")[4], 10);
+  // const { services } = useSelector((state) => state.adminData);
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const [currentSP, setCurrentSP] = useState(null);
-  const [currentService, setCurrentService] = useState({});
+  const [fetchingSp, setFetchingSp] = useState(false);
+  const [products, setProducts] = useState(null);
+  const [reviews, setReviews] = useState(null);
+  // const [currentService, setCurrentService] = useState({});
 
-  //Fetching Selected Service provider
   useEffect(() => {
-    const index = dummySPs.findIndex((item) => item.id === spId);
-    if (index === -1) {
-      navigate("/404");
-    } else {
-      setCurrentSP(dummySPs[index]);
-    }
+    fetchSP();
+    fetchSpPdts();
+    fetchSpReviews();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spId]);
+  }, [SPid]);
 
-  //Fetching Service Details
-  useEffect(() => {
-    if (currentSP) {
-      const index = servicesArr.findIndex((item) => item.id === currentSP.sId);
-      if (index === -1) {
-        // navigate("/404");
+  // //Fetching Service Details
+  // useEffect(() => {
+  //   if (currentSP && services) {
+  //     const index = services.findIndex((item) => item.Sid === currentSP.Sid);
+  //     if (index === -1) {
+  //       // navigate("/404");
+  //     } else {
+  //       setCurrentService(services[index]);
+  //     }
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [currentSP]);
+
+  const fetchSP = async () => {
+    try {
+      setFetchingSp(true);
+      const res = await myRequest.get(`/admin.api/fetchSP/${SPid}`);
+      if (res.status === 200) {
+        setCurrentSP(res.data);
       } else {
-        setCurrentService(servicesArr[index]);
+        enqueueSnackbar("Error: Something went wrong", { variant: "error" });
       }
+    } catch (err) {
+      enqueueSnackbar("Error: Something went wrong", { variant: "error" });
+      enqueueSnackbar(err.response?.data, { variant: "error" });
+      console.log(err);
+      if (err.response) {
+        console.log(err.response, err.message);
+      } else if (err.request) {
+        if (err.request.status) {
+          console.error(err.message, err.request);
+        } else {
+          console.log(err.request, err.message);
+        }
+      } else {
+        console.log(err.message);
+      }
+    } finally {
+      setFetchingSp(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSP]);
+  };
+
+  const fetchSpPdts = async () => {
+    try {
+      const res = await myRequest.get(`/admin.api/getPdts/${SPid}`);
+      if (res.status === 200) {
+        setProducts(res.data);
+      } else {
+        enqueueSnackbar("Error: Something went wrong", { variant: "error" });
+      }
+    } catch (err) {
+      enqueueSnackbar("Error: Something went wrong", { variant: "error" });
+      enqueueSnackbar(err.response?.data, { variant: "error" });
+      console.log(err);
+      if (err.response) {
+        console.log(err.response, err.message);
+      } else if (err.request) {
+        if (err.request.status) {
+          console.error(err.message, err.request);
+        } else {
+          console.log(err.request, err.message);
+        }
+      } else {
+        console.log(err.message);
+      }
+    } finally {
+    }
+  };
+
+  const fetchSpReviews = async () => {
+    try {
+      const res = await myRequest.get(`/admin.api/fetchComments/${SPid}`);
+      if (res.status === 200) {
+        setReviews(res.data);
+      } else {
+        enqueueSnackbar("Error: Something went wrong", { variant: "error" });
+      }
+    } catch (err) {
+      enqueueSnackbar("Error: Something went wrong", { variant: "error" });
+      enqueueSnackbar(err.response?.data, { variant: "error" });
+      console.log(err);
+      if (err.response) {
+        console.log(err.response, err.message);
+      } else if (err.request) {
+        if (err.request.status) {
+          console.error(err.message, err.request);
+        } else {
+          console.log(err.request, err.message);
+        }
+      } else {
+        console.log(err.message);
+      }
+    } finally {
+    }
+  };
 
   return (
     <Container maxWidth="xl">
@@ -76,18 +158,23 @@ const ServiceProvider = () => {
         {currentSP && (
           <>
             <Grid item xs={12} md={12} lg={12}>
-              <CompanyInfo data={currentSP} />
+              <CompanyInfo data={currentSP} setCurrentSP={setCurrentSP} />
             </Grid>
             <Grid item xs={12} md={12} lg={12}>
-              <OwnerInfo data={ownerSample} />
-            </Grid>
-            <Grid item xs={12} md={12} lg={12}>
-              <ProductsTb products={currentSP.pricing} />
-            </Grid>
-            <Grid item xs={12} md={12} lg={12}>
-              <ReviewsTb reviews={dummyReviews} />
+              <OwnerInfo data={currentSP.owner} />
             </Grid>
           </>
+        )}
+        {products && (
+          <Grid item xs={12} md={12} lg={12}>
+            <ProductsTb products={products} />
+          </Grid>
+        )}
+
+        {reviews && (
+          <Grid item xs={12} md={12} lg={12}>
+            <ReviewsTb reviews={reviews} />
+          </Grid>
         )}
       </Grid>
     </Container>

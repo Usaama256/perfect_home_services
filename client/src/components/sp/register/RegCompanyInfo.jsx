@@ -16,25 +16,106 @@ import {
   Unstable_Grid2 as Grid,
 } from "@mui/material";
 import { ArrowBackIos, ArrowForwardIos, CameraAlt } from "@mui/icons-material";
-import { dummySPs } from "../../../store/dummies";
 import styled from "styled-components";
-import { servicesArr } from "../../../store/services";
+import { imgFromLocalToBase64 } from "../../../store/base64ImgConverter";
+import { useState } from "react";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import {
+  validateEmail,
+  validatePhoneNumber1,
+} from "../../../store/otherMethods";
+import { useSnackbar } from "notistack";
 
-const RegCompanyInfo = ({ onBack, onNext }) => {
-  const SP = dummySPs[0];
+const RegCompanyInfo = ({ onBack, onNext, spInfo, setSpInfo }) => {
+  const { services } = useSelector((state) => state.services);
+  const { enqueueSnackbar } = useSnackbar();
+  const [middleman, setMiddleman] = useState({
+    email: "",
+    title: "",
+    tel: "",
+    location: "",
+    desc: "",
+    Sid: "",
+    logo: "",
+  });
+  const [service, setService] = useState(null);
+
+  useEffect(() => {
+    setMiddleman(spInfo);
+    if (spInfo.Sid) {
+      const index = services.filter(
+        (i) => parseInt(i.id, 10) === parseInt(spInfo.Sid, 10)
+      );
+      setService(services[index]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spInfo]);
+
+  useEffect(() => {
+    if (middleman.Sid) {
+      const index = services.filter(
+        (i) => parseInt(i.id, 10) === parseInt(middleman.Sid, 10)
+      );
+      setService(services[index]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [middleman.Sid]);
 
   //Image change handler
   const editAvatorHandler = (e) => {
     //console.log(e.target.files);
-    if (e.target.files.length !== 0) {
+    if (e.target.files?.length > 0) {
+      imgFromLocalToBase64(e.target.files[0]).then((base64str) => {
+        setMiddleman({ ...middleman, logo: base64str });
+      });
     }
     e.target.value = null;
   };
 
-  const resetFields = () => {};
+  const onNextHandler = () => {
+    console.log(middleman);
+    if (
+      middleman.email?.length > 6 &&
+      middleman.title?.length > 2 &&
+      middleman.location?.length > 2 &&
+      middleman.tel?.length > 9 &&
+      `${middleman.Sid}`?.length > 0 &&
+      middleman.desc?.length > 10
+    ) {
+      if (validateEmail(middleman.email)) {
+        if (validatePhoneNumber1(middleman.tel)) {
+          setSpInfo(middleman);
+          onNext();
+        } else {
+          enqueueSnackbar("Enter a valid email phone number", {
+            variant: "error",
+          });
+        }
+      } else {
+        enqueueSnackbar("Enter a valid email address", { variant: "error" });
+      }
+    } else {
+      enqueueSnackbar("Enter All Fields", { variant: "error" });
+    }
+  };
 
-  const closeHandler = () => {
-    resetFields();
+  const onBackHandler = () => {
+    setSpInfo(middleman);
+    onBack();
+  };
+
+  const resetFields = () => {
+    setMiddleman({
+      email: "",
+      title: "",
+      tel: "",
+      location: "",
+      desc: "",
+      Sid: "",
+      pass: "",
+      logo: "",
+    });
   };
 
   return (
@@ -64,7 +145,7 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
                     disabled={false}
                     name="imageUpload"
                     accept="image/*"
-                    onChange={editAvatorHandler}
+                    onChange={(e) => editAvatorHandler(e)}
                   />
                   <Card
                     style={{
@@ -80,15 +161,17 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
                       width: 220,
                     }}
                   >
-                    <img
-                      src={SP.logo}
-                      alt="logo"
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                    />
+                    {middleman.logo && (
+                      <img
+                        src={middleman.logo}
+                        alt="logo"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                      />
+                    )}
                   </Card>
                   <label htmlFor="logoUpload">
                     <UploadBtn>
@@ -104,9 +187,11 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
                 <TextField
                   fullWidth
                   label="Company Name"
-                  // onChange={() => {}}
                   required
-                  // value={SP.title}
+                  value={middleman.title}
+                  onChange={(e) =>
+                    setMiddleman({ ...middleman, title: e.target.value })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -114,9 +199,11 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
                   fullWidth
                   label="Location"
                   name="location"
-                  // onChange={() => {}}
                   required
-                  // value={SP.location}
+                  value={middleman.location}
+                  onChange={(e) =>
+                    setMiddleman({ ...middleman, location: e.target.value })
+                  }
                 />
               </Grid>
             </Grid>
@@ -126,26 +213,22 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
                 <TextField
                   fullWidth
                   label="Email Address"
-                  // onChange={() => {}}
                   required
-                  // value={SP.email[0]}
+                  value={middleman.email}
+                  onChange={(e) =>
+                    setMiddleman({ ...middleman, email: e.target.value })
+                  }
                 />
               </Grid>
-              <Grid item xs={12} md={3}>
+              <Grid item xs={12} md={6}>
                 <TextField
                   fullWidth
-                  label="Phone Number (Primary)"
-                  // onChange={() => {}}
+                  label="Phone Number"
                   required
-                  // value={SP.tel[0]}
-                />
-              </Grid>
-              <Grid item xs={12} md={3}>
-                <TextField
-                  fullWidth
-                  label="Phone Number (Optional)"
-                  // onChange={() => {}}
-                  // value={SP.tel[0]}
+                  value={middleman.tel}
+                  onChange={(e) =>
+                    setMiddleman({ ...middleman, tel: e.target.value })
+                  }
                 />
               </Grid>
               <Grid item xs={12} md={6}>
@@ -157,14 +240,19 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
                   <Select
                     labelId="select-small"
                     id="select-small"
-                    value={servicesArr[0].name}
-                    label="currency"
+                    value={service?.name}
+                    label="Category"
                     required
-                    // onChange={(event) => setCurrency(event.target.value)}
+                    onChange={(e) =>
+                      setMiddleman({
+                        ...middleman,
+                        Sid: parseInt(e.target.value.split("+")[1], 10),
+                      })
+                    }
                   >
-                    {servicesArr.map((i, n) => {
+                    {services.map((i, n) => {
                       return (
-                        <MenuItem value={i.name} key={i.id}>
+                        <MenuItem value={`${i.name}+${i.id}`} key={i.id}>
                           {i.name}
                         </MenuItem>
                       );
@@ -179,9 +267,11 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
                   helperText="Not More than 120 words"
                   multiline
                   rows={6}
-                  // onChange={() => {}}
                   required
-                  // value={SP.desc}
+                  value={middleman.desc}
+                  onChange={(e) =>
+                    setMiddleman({ ...middleman, desc: e.target.value })
+                  }
                 />
               </Grid>
             </Grid>
@@ -198,7 +288,7 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
               <ArrowBackIos />
             </SvgIcon>
           }
-          onClick={() => onBack()}
+          onClick={() => onBackHandler()}
         >
           Back
         </Button>
@@ -208,7 +298,11 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
           justifyContent="space-around"
           spacing={3}
         >
-          <Button variant="outlined" color="secondary">
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => resetFields()}
+          >
             Reset Fields
           </Button>
           <Button
@@ -219,7 +313,7 @@ const RegCompanyInfo = ({ onBack, onNext }) => {
                 <ArrowForwardIos />
               </SvgIcon>
             }
-            onClick={() => onNext()}
+            onClick={() => onNextHandler()}
           >
             Next
           </Button>

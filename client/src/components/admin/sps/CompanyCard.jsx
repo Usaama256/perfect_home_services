@@ -9,17 +9,17 @@ import {
   Typography,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { logo_g } from "../../../store/images";
 import ProgressiveImage from "../../ProgressiveImage";
 
 const CompanyCard = ({
-  id,
-  title,
-  logo,
-  desc,
-  rating,
+  SPid,
+  SPname,
+  logoImg,
+  description,
+  rateValue,
   location,
   status,
+  approved,
   sx,
 }) => {
   const navigate = useNavigate();
@@ -59,11 +59,11 @@ const CompanyCard = ({
             }}
           >
             <ProgressiveImage
-              src={logo}
-              placeholder={logo_g}
+              src={logoImg}
+              // placeholder={logo_g}
               width={100}
               style={{ cursor: "pointer" }}
-              onClick={() => navigate(`/admin/dash/sps/${id}`)}
+              onClick={() => navigate(`/admin/dash/sps/${SPid}`)}
             />
           </div>
         </Box>
@@ -77,16 +77,18 @@ const CompanyCard = ({
             fontWeight: "bold",
             color: "#3f42ff",
           }}
-          onClick={() => navigate(`/admin/dash/sps/${id}`)}
+          onClick={() => navigate(`/admin/dash/sps/${SPid}`)}
         >
-          {title}
+          {SPname}
         </Typography>
         <Typography
           align="center"
           variant="body1"
           sx={{ fontsize: "16px", fontWeight: "bold", color: "#666" }}
         >
-          {desc?.length < 100 ? desc : `${desc?.substring(0, 100)}...`}
+          {description?.length < 100
+            ? description
+            : `${description?.substring(0, 100)}...`}
         </Typography>
       </CardContent>
       <Box sx={{ flexGrow: 1 }} />
@@ -116,7 +118,7 @@ const CompanyCard = ({
             display="inline"
             variant="body1"
           >
-            {status === "active" ? "Active" : "Activation Pending"}
+            {status === "active" ? "Active" : "Suspended"}
           </Typography>
         </Stack>
         <Stack alignItems="center" direction="row" spacing={1}>
@@ -124,7 +126,7 @@ const CompanyCard = ({
             <StarRateOutlined style={{ color: "#3f42ff !important" }} />
           </SvgIcon>
           <Typography color="text.secondary" display="inline" variant="body2">
-            {rating?.value}
+            {rateValue?.value}
           </Typography>
         </Stack>
       </Stack>

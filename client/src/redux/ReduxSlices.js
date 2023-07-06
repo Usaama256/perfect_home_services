@@ -1,40 +1,40 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-//App Data start
-const productsSlice = createSlice({
-  name: "products",
+//Services Slice
+const servicesSlice = createSlice({
+  name: "services",
   initialState: {
-    data: null,
+    services: null,
     isFetching: false,
     isRefreshing: false,
     error: null,
   },
   reducers: {
-    appDataFetchStart: (state) => {
+    servicesFetchStart: (state) => {
       state.isFetching = true;
       state.error = null;
     },
-    appDataFetchSuccess: (state, actions) => {
-      state.data = actions.payload;
+    servicesFetchSuccess: (state, actions) => {
+      state.services = actions.payload;
       state.isFetching = false;
       state.error = null;
     },
-    appDataFetchFail: (state, actions) => {
+    servicesFetchFail: (state, actions) => {
       state.isFetching = false;
       state.isRefreshing = false;
       state.error = actions.payload;
     },
-    appDataFetchRefreshStart: (state) => {
+    servicesFetchRefreshStart: (state) => {
       state.isRefreshing = true;
     },
-    appDataFetchRefreshSuccess: (state, actions) => {
-      state.data = actions.payload;
+    servicesFetchRefreshSuccess: (state, actions) => {
+      state.services = actions.payload;
       state.isFetching = false;
       state.isRefreshing = false;
       state.error = null;
     },
-    appDataCleanup: (state) => {
-      state.data = null;
+    servicesCleanup: (state) => {
+      state.services = null;
       state.isFetching = false;
       state.isRefreshing = false;
       state.error = null;
@@ -43,16 +43,70 @@ const productsSlice = createSlice({
 });
 
 export const {
-  appDataFetchStart,
-  appDataFetchSuccess,
-  appDataFetchFail,
-  appDataFetchRefreshStart,
-  appDataFetchRefreshSuccess,
-  appDataCleanup,
-} = productsSlice.actions;
+  servicesFetchStart,
+  servicesFetchSuccess,
+  servicesFetchFail,
+  servicesFetchRefreshStart,
+  servicesFetchRefreshSuccess,
+  servicesCleanup,
+} = servicesSlice.actions;
 
-export const appDataRedux = productsSlice.reducer;
-//App Data end
+export const servicesRedux = servicesSlice.reducer;
+//Services Slice end
+
+//SPs Slice
+const sPs = createSlice({
+  name: "sPs",
+  initialState: {
+    sPs: null,
+    isFetching: false,
+    isRefreshing: false,
+    error: null,
+  },
+  reducers: {
+    sPsFetchStart: (state) => {
+      state.isFetching = true;
+      state.error = null;
+    },
+    sPsFetchSuccess: (state, actions) => {
+      state.sPs = actions.payload;
+      state.isFetching = false;
+      state.error = null;
+    },
+    sPsFetchFail: (state, actions) => {
+      state.isFetching = false;
+      state.isRefreshing = false;
+      state.error = actions.payload;
+    },
+    sPsFetchRefreshStart: (state) => {
+      state.isRefreshing = true;
+    },
+    sPsFetchRefreshSuccess: (state, actions) => {
+      state.sPs = actions.payload;
+      state.isFetching = false;
+      state.isRefreshing = false;
+      state.error = null;
+    },
+    sPsCleanup: (state) => {
+      state.sPs = null;
+      state.isFetching = false;
+      state.isRefreshing = false;
+      state.error = null;
+    },
+  },
+});
+
+export const {
+  sPsFetchStart,
+  sPsFetchSuccess,
+  sPsFetchFail,
+  sPsFetchRefreshStart,
+  sPsFetchRefreshSuccess,
+  sPsCleanup,
+} = sPs.actions;
+
+export const sPsRedux = sPs.reducer;
+//SPs Slice end
 
 //User slice
 const userSlice = createSlice({
@@ -65,6 +119,11 @@ const userSlice = createSlice({
   reducers: {
     loginStart: (state) => {
       state.isFetching = true;
+      state.user = null;
+      state.error = null;
+    },
+    byPassloginStart: (state) => {
+      state.isFetching = true;
       state.error = null;
     },
     loginSuccess: (state, actions) => {
@@ -75,6 +134,7 @@ const userSlice = createSlice({
     loginFail: (state, actions) => {
       state.isFetching = false;
       state.error = actions.payload;
+      state.user = null;
     },
     userCleanup: (state) => {
       state.user = null;
@@ -85,43 +145,74 @@ const userSlice = createSlice({
   },
 });
 
-export const { loginStart, loginSuccess, loginFail, userCleanup } =
-  userSlice.actions;
+export const {
+  loginStart,
+  loginSuccess,
+  loginFail,
+  byPassloginStart,
+  userCleanup,
+} = userSlice.actions;
 
 export const userRedux = userSlice.reducer;
-//App Data end
+//User Slice end
 
-//cart slice
-const cartSlice = createSlice({
-  name: "cart",
+//Admin data slice
+const adminDataSlice = createSlice({
+  name: "adminData",
   initialState: {
-    items: null,
-    number: 0,
-    total: 0,
+    services: null,
+    users: null,
+    sps: null,
   },
   reducers: {
-    addItem: (state, actions) => {
-      state.items = actions.payload;
+    setServices: (state, actions) => {
+      state.services = actions.payload;
     },
-    changeNumber: (state, actions) => {
-      state.number = actions.payload;
+    setUsers: (state, actions) => {
+      state.users = actions.payload;
     },
-    changeTotal: (state, actions) => {
-      state.total = actions.payload;
+    setSps: (state, actions) => {
+      state.sps = actions.payload;
     },
-    removeItem: (state, actions) => {
-      state.items = actions.payload;
-    },
-    cartCleanUp: (state) => {
-      state.items = null;
-      state.number = 0;
-      state.total = 0;
+    adminDataCleanup: (state) => {
+      state.services = null;
+      state.users = null;
+      state.sps = null;
     },
   },
 });
+export const { setServices, setUsers, setSps, adminDataCleanup } =
+  adminDataSlice.actions;
 
-export const { addItem, removeItem, changeNumber, changeTotal, cartCleanUp } =
-  cartSlice.actions;
+export const adminDataRedux = adminDataSlice.reducer;
+//Admin Data End
 
-export const cartRedux = cartSlice.reducer;
-//cart end
+//Sp data slice
+const spDataSlice = createSlice({
+  name: "spData",
+  initialState: {
+    products: null,
+    comments: null,
+    callings: null,
+  },
+  reducers: {
+    setProducts: (state, actions) => {
+      state.products = actions.payload;
+    },
+    setComments: (state, actions) => {
+      state.comments = actions.payload;
+    },
+    setCallings: (state, actions) => {
+      state.callings = actions.payload;
+    },
+    spDataCleanup: (state) => {
+      state.products = null;
+      state.comments = null;
+      state.callings = null;
+    },
+  },
+});
+export const { setProducts, setComments, setCallings, spDataCleanup } =
+  spDataSlice.actions;
+
+export const spDataRedux = spDataSlice.reducer;
