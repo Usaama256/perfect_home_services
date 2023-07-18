@@ -192,7 +192,7 @@ const CompanyInfo = ({ data, setCurrentSP }) => {
       )}
       <CardContent sx={{ pt: 0 }}>
         <Box sx={{ margin: "20px 0px 10px 0px" }}>
-          <Grid container spacing={3} columns={12}>
+          <Stack flexDirection="row" justifyContent="center" gap={2}>
             <Grid container spacing={1} xs={12} md={6} columns={6}>
               <Grid item xs={12} md={6}>
                 <Stack
@@ -316,7 +316,7 @@ const CompanyInfo = ({ data, setCurrentSP }) => {
                 />
               </Grid>
             </Grid>
-          </Grid>
+          </Stack>
         </Box>
       </CardContent>
       <Divider />
