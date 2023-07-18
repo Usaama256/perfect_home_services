@@ -24,7 +24,7 @@ const Navbar = ({ fixed }) => {
       {openLogout && (
         <LogoutConfirmDialog open={openLogout} setOpen={setOpenLogout} />
       )}
-      <div id="topNav" className="nav">
+      <div id="topNav" className="nav fixedNav">
         <div
           className="item"
           style={{ cursor: "pointer" }}

@@ -1,0 +1,1 @@
+import{f as e,j as t,T as i,aN as r}from"./index-f05f604f.js";import{C as s}from"./Container-62f5593e.js";const m=()=>e(s,{maxWidth:"xl",children:[t(i,{variant:"h4",sx:{mb:5},children:"Settings"}),e(r,{container:!0,spacing:3,children:[t(r,{item:!0,xs:12,md:6,lg:12,children:"Settings"}),t(r,{item:!0,xs:12,md:6,lg:12})]})]});export{m as default};

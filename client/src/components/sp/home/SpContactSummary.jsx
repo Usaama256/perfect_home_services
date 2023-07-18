@@ -30,7 +30,7 @@ const SpContactSummary = ({ calls, userActive, sx }) => {
   return (
     <Card sx={sx}>
       <CardHeader
-        title="User Call Requests"
+        title="Clients' Call Requests"
         subheader="Please Contact these clients"
       />
       <br />

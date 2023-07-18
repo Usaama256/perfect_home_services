@@ -40,8 +40,8 @@ const ActivateSuspendDialog = ({
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
             {active === true
-              ? "Users will not be able to see this service provider, However the service provider will be able to log in."
-              : "Users will see this service providers products and details"}
+              ? "Clients will not be able to see this service provider, However the service provider will be able to log in."
+              : "Clients will see this service providers products and details"}
           </DialogContentText>
         </DialogContent>
         <DialogActions>

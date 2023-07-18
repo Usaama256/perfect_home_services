@@ -58,7 +58,7 @@ const AdminHome = () => {
   };
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
   }, []);
   return (
     <Container maxWidth="xl">
@@ -86,7 +86,7 @@ const AdminHome = () => {
 
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Users"
+            title="Clients"
             total={totals.users}
             // color="warning"
             icon={<PeopleAlt />}

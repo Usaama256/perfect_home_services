@@ -200,7 +200,7 @@ const ServiceProviders = () => {
           </FormControl>
         </Search>
 
-        {!displayedSPs && !isFetching && (
+        {displayedSPs?.length === 0 && !isFetching && (
           <h2 style={{ margin: "20px 0px" }}>No Service Providers Yet</h2>
         )}
 

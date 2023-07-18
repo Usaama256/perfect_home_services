@@ -4,9 +4,25 @@ import { useNavigate } from "react-router-dom";
 import { Explore } from "@material-ui/icons";
 import { Button } from "@mui/material";
 import Slider from "./Slider";
+import { useSelector } from "react-redux";
+import { useSnackbar } from "notistack";
 
 const ServiceCard = ({ id, name, desc, imgs }) => {
+  const { user } = useSelector((state) => state.user);
+  const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+
+  const openService = () => {
+    if (user) {
+      navigate(`/service/${id}`);
+    } else {
+      enqueueSnackbar("Make sure you are logged in please", {
+        variant: "warning",
+      });
+      const i = setTimeout(() => navigate(`/auth/cl/login`), 500);
+      return () => clearTimeout(i);
+    }
+  };
   return (
     <Container>
       {/* <ProgressiveImage src={imgs[0].src} /> */}
@@ -24,7 +40,7 @@ const ServiceCard = ({ id, name, desc, imgs }) => {
       <div className="info">
         <div className="btnCont">
           <Button
-            onClick={() => navigate(`/service/${id}`)}
+            onClick={() => openService()}
             variant="outlined"
             color="primary"
             endIcon={<Explore />}

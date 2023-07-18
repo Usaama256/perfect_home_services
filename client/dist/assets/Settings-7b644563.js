@@ -1,1 +1,0 @@
-import{a as i,j as t,h as e}from"./index-559316ce.js";import{C as s}from"./Container-49e24797.js";import{G as r}from"./Grid-2fa76f59.js";const o=()=>i(s,{maxWidth:"xl",children:[t(e,{variant:"h4",sx:{mb:5},children:"Settings"}),i(r,{container:!0,spacing:3,children:[t(r,{item:!0,xs:12,md:6,lg:12,children:"Settings"}),t(r,{item:!0,xs:12,md:6,lg:12})]})]});export{o as default};

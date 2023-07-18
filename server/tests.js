@@ -425,50 +425,50 @@ const testAdmin = async () => {
 //   }
 // });
 
-const SPid = 9;
-db.query(
-  `select SPid, SPname, email, contact, location, logoImg, description, status, approved, rateValue, reviewsNo, ServiceProviders.createdAt, ServiceProviders.updatedAt, Sid, Sname from ServiceProviders join Services using (Sid) join Ratings using (SPid) where SPid='${SPid}'`,
-  (err, SP) => {
-    if (err) {
-      console.log(err);
-      console.log("Something went wrong");
-    } else {
-      db.query(
-        `select * from SPOwners where SPid='${SPid}'`,
-        (err, SPOwner) => {
-          if (err) {
-            console.log(err);
-            console.log("Something went wrong");
-          } else {
-            console.log({
-              SPid: SP[0].SPid,
-              email: SP[0].email,
-              title: SP[0].SPname,
-              tel: SP[0].contact,
-              location: SP[0].location,
-              desc: SP[0].description,
-              logo: SP[0].logoImg,
-              status: SP[0].status,
-              approved: SP[0].approved,
-              Sid: SP[0].Sid,
-              Sname: SP[0].Sname,
-              rating: { value: SP[0].rateValue, reviews: SP[0].reviewsNo },
-              owner: {
-                SPid: SP[0].SPid,
-                OwnerId: SPOwner[0].OwnerId,
-                position: SPOwner[0].position,
-                firstName: SPOwner[0].firstName,
-                lastName: SPOwner[0].lastName,
-                location: SPOwner[0].location,
-                email: SPOwner[0].email,
-                tel: SPOwner[0].contact,
-                desc: SPOwner[0].desc,
-                avator: SPOwner[0].profilePic,
-              },
-            });
-          }
-        }
-      );
-    }
-  }
-);
+// const SPid = 9;
+// db.query(
+//   `select SPid, SPname, email, contact, location, logoImg, description, status, approved, rateValue, reviewsNo, ServiceProviders.createdAt, ServiceProviders.updatedAt, Sid, Sname from ServiceProviders join Services using (Sid) join Ratings using (SPid) where SPid='${SPid}'`,
+//   (err, SP) => {
+//     if (err) {
+//       console.log(err);
+//       console.log("Something went wrong");
+//     } else {
+//       db.query(
+//         `select * from SPOwners where SPid='${SPid}'`,
+//         (err, SPOwner) => {
+//           if (err) {
+//             console.log(err);
+//             console.log("Something went wrong");
+//           } else {
+//             console.log({
+//               SPid: SP[0].SPid,
+//               email: SP[0].email,
+//               title: SP[0].SPname,
+//               tel: SP[0].contact,
+//               location: SP[0].location,
+//               desc: SP[0].description,
+//               logo: SP[0].logoImg,
+//               status: SP[0].status,
+//               approved: SP[0].approved,
+//               Sid: SP[0].Sid,
+//               Sname: SP[0].Sname,
+//               rating: { value: SP[0].rateValue, reviews: SP[0].reviewsNo },
+//               owner: {
+//                 SPid: SP[0].SPid,
+//                 OwnerId: SPOwner[0].OwnerId,
+//                 position: SPOwner[0].position,
+//                 firstName: SPOwner[0].firstName,
+//                 lastName: SPOwner[0].lastName,
+//                 location: SPOwner[0].location,
+//                 email: SPOwner[0].email,
+//                 tel: SPOwner[0].contact,
+//                 desc: SPOwner[0].desc,
+//                 avator: SPOwner[0].profilePic,
+//               },
+//             });
+//           }
+//         }
+//       );
+//     }
+//   }
+// );

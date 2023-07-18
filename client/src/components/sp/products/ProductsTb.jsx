@@ -169,7 +169,7 @@ const ProductsTb = ({ products, SPid }) => {
       const res = await myRequest.get(`/sp.api/deletePdt/${SPid}/${id}`);
       if (res.status === 200) {
         enqueueSnackbar("Product Deleted Successfully", { variant: "success" });
-        fetchSpProductsSP(dispatch);
+        fetchSpProductsSP(SPid, dispatch);
       } else {
         enqueueSnackbar("Error: Deleting Failed", { variant: "error" });
       }

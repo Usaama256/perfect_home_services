@@ -220,7 +220,7 @@ const LoginNavMenu = ({ children }) => {
                     onKeyDown={handleListKeyDown}
                   >
                     <MenuItem onClick={(e) => openLogin(e, "user")}>
-                      User
+                      Client
                     </MenuItem>
                     <Divider sx={{ my: 0.5 }} />
                     <MenuItem onClick={(e) => openLogin(e, "sp")}>

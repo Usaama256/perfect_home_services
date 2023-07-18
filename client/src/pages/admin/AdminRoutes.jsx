@@ -110,7 +110,7 @@ const AdminRoutes = () => {
       <Route
         path="/users"
         element={
-          <SPLayout title="Admin Users">
+          <SPLayout title="Admin Clients">
             <Suspense
               fallback={
                 <div>
@@ -126,7 +126,7 @@ const AdminRoutes = () => {
       <Route
         path="/user/:id"
         element={
-          <SPLayout title="Admin Users">
+          <SPLayout title="Admin Clients">
             <Suspense
               fallback={
                 <div>

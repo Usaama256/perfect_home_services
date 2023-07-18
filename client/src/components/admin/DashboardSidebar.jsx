@@ -35,7 +35,7 @@ const navConfig = [
     icon: <Business width={22} height={22} />,
   },
   {
-    title: "users",
+    title: "clients",
     path: "/admin/dash/users",
     icon: <PeopleAlt width={22} height={22} />,
   },

@@ -5,7 +5,7 @@ import Preloader from "../components/Preloader";
 import TopSlider from "../components/TopSlider";
 import { fetchServices, fetchSPs } from "../redux/apiCalls";
 import { lazyImportRetry } from "../store/lazyDynamicImports";
-import AdminRoutes from "./admin/AdminRoutes";
+// import AdminRoutes from "./admin/AdminRoutes";
 import {
   AdminAuthPagesGuard,
   AdminPrivateRoutes,
@@ -17,11 +17,11 @@ import {
 // import SProutes from "./SP/SProutes";
 // import SPLogin from "./SP/SPLogin";
 // import SPRegister from "./SP/SPRegister";
-// import Home from "./Home";
+import Home from "./Home";
 // import Page404 from "./Page404";
-// import Auth from "./Auth";
-// import ServiceProviders from "./ServiceProviders";
-// import ServiceProvider from "./ServiceProvider";
+import Auth from "./Auth";
+import ServiceProviders from "./ServiceProviders";
+import ServiceProvider from "./ServiceProvider";
 
 // const Home = lazy(() =>
 //   import("./Home").then((module) => {
@@ -29,14 +29,17 @@ import {
 //     return module;
 //   })
 // );
-const Home = lazy(() => lazyImportRetry(() => import("./Home")));
-const Auth = lazy(() => lazyImportRetry(() => import("./Auth")));
+// const Home = lazy(() => lazyImportRetry(() => import("./Home")));
+// const Auth = lazy(() => lazyImportRetry(() => import("./Auth")));
 const SPlogin = lazy(() => lazyImportRetry(() => import("./SP/SPLogin")));
-const SPreister = lazy(() => lazyImportRetry(() => import("./SP/SPRegister")));
-const SPs = lazy(() => lazyImportRetry(() => import("./ServiceProviders")));
-const SingleSP = lazy(() => lazyImportRetry(() => import("./ServiceProvider")));
+const SPregister = lazy(() => lazyImportRetry(() => import("./SP/SPRegister")));
+// const SPs = lazy(() => lazyImportRetry(() => import("./ServiceProviders")));
+// const SingleSP = lazy(() => lazyImportRetry(() => import("./ServiceProvider")));
 const P404 = lazy(() => lazyImportRetry(() => import("./Page404")));
 const SProutes = lazy(() => lazyImportRetry(() => import("./SP/SProutes")));
+const AdminRoutes = lazy(() =>
+  lazyImportRetry(() => import("./admin/AdminRoutes"))
+);
 
 const PageRoutes = () => {
   const dispatch = useDispatch();
@@ -54,15 +57,7 @@ const PageRoutes = () => {
         element={
           <>
             <TopSlider />
-            <Suspense
-              fallback={
-                <div>
-                  <Preloader />
-                </div>
-              }
-            >
-              <Home />
-            </Suspense>
+            <Home />
           </>
         }
       />
@@ -71,15 +66,7 @@ const PageRoutes = () => {
         element={
           <UserPrivateRoutes>
             <TopSlider />
-            <Suspense
-              fallback={
-                <div>
-                  <Preloader />
-                </div>
-              }
-            >
-              <SPs />
-            </Suspense>
+            <ServiceProviders />
           </UserPrivateRoutes>
         }
       />
@@ -88,15 +75,7 @@ const PageRoutes = () => {
         element={
           <UserPrivateRoutes>
             <TopSlider />
-            <Suspense
-              fallback={
-                <div>
-                  <Preloader />
-                </div>
-              }
-            >
-              <SingleSP />
-            </Suspense>
+            <ServiceProvider />
           </UserPrivateRoutes>
         }
       />
@@ -104,15 +83,7 @@ const PageRoutes = () => {
         path="/auth/cl/login"
         element={
           <UserAuthPagesGuard>
-            <Suspense
-              fallback={
-                <div>
-                  <Preloader />
-                </div>
-              }
-            >
-              <Auth type={"user"} />
-            </Suspense>
+            <Auth type={"user"} />
           </UserAuthPagesGuard>
         }
       />
@@ -121,15 +92,7 @@ const PageRoutes = () => {
         path="/auth/ad/login"
         element={
           <AdminAuthPagesGuard>
-            <Suspense
-              fallback={
-                <div>
-                  <Preloader />
-                </div>
-              }
-            >
-              <Auth type={"admin"} />
-            </Suspense>
+            <Auth type={"admin"} />
           </AdminAuthPagesGuard>
         }
       />
@@ -192,7 +155,7 @@ const PageRoutes = () => {
                 </div>
               }
             >
-              <SPreister />
+              <SPregister />
             </Suspense>
           </SPAuthPagesGuard>
         }

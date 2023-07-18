@@ -85,7 +85,7 @@ const Auth = ({ type }) => {
         </div>
         <div className="form-container sign-up-container">
           <form action="#">
-            <h1>Create User Account</h1>
+            <h1>Create Client Account</h1>
             {/* <div className="social-container">
               <Link to={() => false} className="social">
                 <Google />
@@ -196,7 +196,7 @@ const Auth = ({ type }) => {
         </div>
         <div className="form-container sign-in-container">
           <form action="#">
-            <h1>{type === "admin" ? "Admin Login" : "User Login"}</h1>
+            <h1>{type === "admin" ? "Admin Login" : "Client Login"}</h1>
             <div className="social-container">
               <RouterLink to={() => false} className="social">
                 <Google />

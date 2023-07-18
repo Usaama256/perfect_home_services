@@ -40,7 +40,7 @@ const ApproveDisapproveDialog = ({
         <DialogContent>
           <DialogContentText id="alert-dialog-slide-description">
             {approved === true
-              ? "This will block the Service Provider from logging into the account. And users will not be able to see this service provider"
+              ? "This will block the Service Provider from logging into the account. And Clients will not be able to see this service provider"
               : "This will allow the service provider to log into their account."}
           </DialogContentText>
         </DialogContent>

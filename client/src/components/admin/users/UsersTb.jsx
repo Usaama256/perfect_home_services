@@ -28,7 +28,7 @@ const UsersTb = ({ users, sx }) => {
 
   return (
     <Card sx={sx}>
-      <CardHeader title="Users" />
+      <CardHeader title="Clients" />
       <br />
       <Scrollbar sx={{ flexGrow: 1 }}>
         <Box sx={{ minWidth: 800 }}>

@@ -116,7 +116,7 @@ const AddProduct = ({ SPid }) => {
               variant: "success",
             });
             resetFields();
-            fetchSpProductsSP(dispatch);
+            fetchSpProductsSP(SPid, dispatch);
           } else {
             enqueueSnackbar("Error: Product/Service Not Added", {
               variant: "error",

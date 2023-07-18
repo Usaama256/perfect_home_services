@@ -20,7 +20,7 @@ const Reviews = () => {
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" sx={{ mb: 5 }}>
-        User Comments
+        Clients' Comments
       </Typography>
 
       {userActive === false && <SpAccountSuspendedPop />}

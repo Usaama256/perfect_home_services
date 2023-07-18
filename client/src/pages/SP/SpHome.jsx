@@ -21,7 +21,7 @@ const SpHome = () => {
 
   useEffect(() => {
     fetchSPcallsSP(user.id, dispatch);
-    window.scrollTo(0, 0);
+    // window.scrollTo(0, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
@@ -41,7 +41,7 @@ const SpHome = () => {
 
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="User Comments"
+            title="Clients' Comments"
             total={comments ? comments.length : 0}
             // color="info"
             icon={<Reviews />}
@@ -50,7 +50,7 @@ const SpHome = () => {
 
         <Grid item xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="User Call Requests"
+            title="Clients' Call Requests"
             total={callings ? callings.length : 0}
             // color="warning"
             icon={<ContactPhone />}

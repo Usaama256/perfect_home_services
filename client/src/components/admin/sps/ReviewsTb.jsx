@@ -28,7 +28,7 @@ const ReviewsTb = ({ reviews, sx }) => {
 
   return (
     <Card sx={sx}>
-      <CardHeader title="User Comments On Service Provider" />
+      <CardHeader title="Clients' Comments On Service Provider" />
       <br />
       <Scrollbar sx={{ flexGrow: 1 }}>
         <Box sx={{ minWidth: 800 }}>

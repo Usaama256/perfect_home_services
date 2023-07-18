@@ -18,7 +18,7 @@ const SpAccountSuspendedPop = () => {
     >
       <Typography variant="h4">Account Suspended Temporarily</Typography>
       <Typography variant="body">
-        Note: Users can not see your company in their App
+        Note: Clients can not see your company in their App
       </Typography>
     </Card>
   );
