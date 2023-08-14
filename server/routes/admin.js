@@ -166,7 +166,7 @@ router.post("/addService", async (req, res) => {
             if (i?.length > 20) {
               images.push({
                 title: "",
-                src: `http://localhost:5427/images/services/${name}`,
+                src: `http://perfect-home-services-lruh4.ondigitalocean.app/images/services/${name}`,
                 desc: "",
               });
               console.log("Service image Uploaded");
@@ -347,7 +347,9 @@ router.post("/editServiceImgs/:Sid", async (req, res) => {
       imgsArr.forEach((i, n) => {
         const fName = `${name.replace(/ /g, "-")}_${n + 1}`;
         uploadImage(i, fName, "services").then((name) => {
-          images.push(`http://localhost:5427/images/services/${name}`);
+          images.push(
+            `http://perfect-home-services-lruh4.ondigitalocean.app/images/services/${name}`
+          );
           console.log("Service image Uploaded");
           if (images.length == imgsArr.length) {
             const imgs = JSON.stringify(images);

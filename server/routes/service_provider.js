@@ -88,7 +88,7 @@ router.post("/signup", async (req, res) => {
                         const fName = `${title.replace(/ /g, "-")}_logo`;
                         uploadImage(logo, fName, "SPlogo")
                           .then((name) => {
-                            const logoImg = `http://localhost:5427/images/SPlogo/${name}`;
+                            const logoImg = `http://perfect-home-services-lruh4.ondigitalocean.app/images/SPlogo/${name}`;
                             db.query(
                               `update ServiceProviders set logoImg='${logoImg}' where hash='${hash}'`,
                               (err) => {
@@ -102,7 +102,7 @@ router.post("/signup", async (req, res) => {
                                     )}_owner`;
                                     uploadImage(owner.avator, fName, "SPlogo")
                                       .then((name) => {
-                                        const profilePic = `http://localhost:5427/images/SPlogo/${name}`;
+                                        const profilePic = `http://perfect-home-services-lruh4.ondigitalocean.app/images/SPlogo/${name}`;
                                         db.query(
                                           `update SPOwners set profilePic='${profilePic}' where SPid='${SPid}'`,
                                           (err) => {
@@ -131,7 +131,7 @@ router.post("/signup", async (req, res) => {
                                     )}_owner`;
                                     uploadImage(owner.avator, fName, "SPlogo")
                                       .then((name) => {
-                                        const profilePic = `http://localhost:5427/images/SPlogo/${name}`;
+                                        const profilePic = `http://perfect-home-services-lruh4.ondigitalocean.app/images/SPlogo/${name}`;
                                         db.query(
                                           `update SPOwners set profilePic='${profilePic}' where SPid='${SPid}'`,
                                           (err) => {
@@ -199,7 +199,9 @@ router.post("/addPdt/:SPid", async (req, res) => {
         uploadImage(i, fName, "SPImages").then((fNameWithExt) => {
           if (i?.length > 20) {
             console.log("Img Present");
-            imgs.push(`http://localhost:5427/images/SPImages/${fNameWithExt}`);
+            imgs.push(
+              `http://perfect-home-services-lruh4.ondigitalocean.app/images/SPImages/${fNameWithExt}`
+            );
             console.log("SP Product image Uploaded");
           } else {
             blankNum += 1;
@@ -310,7 +312,9 @@ router.post("/updatePdtImg/:SPid/:Pid", async (req, res) => {
       imagesArr.forEach((i, n) => {
         const fName = `${name.replace(/ /g, "-")}_${SPid}_${n + 1}`;
         uploadImage(i, fName, "SPImages").then((name) => {
-          imgs.push(`http://localhost:5427/images/SPImages/${name}`);
+          imgs.push(
+            `http://perfect-home-services-lruh4.ondigitalocean.app/images/SPImages/${name}`
+          );
           console.log("SP Product image Uploaded");
           if (imgs.length == imagesArr.length) {
             const images = JSON.stringify(imgs);
@@ -409,7 +413,7 @@ router.post("/updateLogo/:SPid", async (req, res) => {
       const fName = `${title.replace(/ /g, "-")}_logo`;
       uploadImage(logo, fName, "SPlogo")
         .then((name) => {
-          const logoImg = `http://localhost:5427/images/SPlogo/${name}`;
+          const logoImg = `http://perfect-home-services-lruh4.ondigitalocean.app/images/SPlogo/${name}`;
           db.query(
             `update ServiceProviders set logoImg='${logoImg}' where SPid='${SPid}'`,
             (err) => {
@@ -443,7 +447,7 @@ router.post("/updateProfilePic/:SPid", async (req, res) => {
       const fName = `${title.replace(/ /g, "-")}_owner`;
       uploadImage(avator, fName, "SPlogo")
         .then((name) => {
-          const profilePic = `http://localhost:5427/images/SPlogo/${name}`;
+          const profilePic = `http://perfect-home-services-lruh4.ondigitalocean.app/images/SPlogo/${name}`;
           db.query(
             `update SPOwners set profilePic='${profilePic}' where SPid='${SPid}'`,
             (err) => {

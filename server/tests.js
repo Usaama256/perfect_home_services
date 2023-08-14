@@ -2,177 +2,179 @@ const db = require("./db/db_man");
 const { uploadImage } = require("./routes/methods");
 const bcrypt = require("bcryptjs");
 
-// const cleaning = [
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/cleaning1.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/cleaning2.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/cleaning3.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/cleaning4.jpg",
-//     desc: "",
-//   },
-// ];
+/*
+const cleaning = [
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/cleaning1.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/cleaning2.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/cleaning3.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/cleaning4.jpg",
+    desc: "",
+  },
+];
 
-// const electrical = [
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/electrical1.jpeg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/electricals1.webp",
-//     desc: "",
-//   },
-// ];
+const electrical = [
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/electrical1.jpeg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/electricals1.webp",
+    desc: "",
+  },
+];
 
-// const decoration = [
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/decoration1.webp",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/decoration2.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/decoration3.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/landscaping2.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/interior_design.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/interior_design2.webp",
-//     desc: "",
-//   },
-// ];
+const decoration = [
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/decoration1.webp",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/decoration2.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/decoration3.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/landscaping2.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/interior_design.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/interior_design2.webp",
+    desc: "",
+  },
+];
 
-// const fumigation = [
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/fumigation1.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/fumigation2.png",
-//     desc: "",
-//   },
-// ];
+const fumigation = [
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/fumigation1.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/fumigation2.png",
+    desc: "",
+  },
+];
 
-// const laundry = [
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/laundry1.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/laundry2.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/laundry3.webp",
-//     desc: "",
-//   },
-// ];
+const laundry = [
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/laundry1.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/laundry2.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/laundry3.webp",
+    desc: "",
+  },
+];
 
-// const painting = [
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/painting1.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/painting2.jpg",
-//     desc: "",
-//   },
-// ];
+const painting = [
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/painting1.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/painting2.jpg",
+    desc: "",
+  },
+];
 
-// const renovation = [
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/renovation1.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/renovation2.png",
-//     desc: "",
-//   },
-// ];
+const renovation = [
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/renovation1.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/renovation2.png",
+    desc: "",
+  },
+];
 
-// const security = [
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/security1.jpg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/security2.jpeg",
-//     desc: "",
-//   },
-//   {
-//     title: "",
-//     src: "http://localhost:5427/images/services/security3.jpg",
-//     desc: "",
-//   },
-// ];
+const security = [
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/security1.jpg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/security2.jpeg",
+    desc: "",
+  },
+  {
+    title: "",
+    src: "http://perfect-home-services-lruh4.ondigitalocean.app/images/services/security3.jpg",
+    desc: "",
+  },
+];
 
-// const genArr = [
-//   laundry,
-//   security,
-//   cleaning,
-//   painting,
-//   fumigation,
-//   decoration,
-//   renovation,
-//   electrical,
-// ];
+const genArr = [
+  laundry,
+  security,
+  cleaning,
+  painting,
+  fumigation,
+  decoration,
+  renovation,
+  electrical,
+];
 
-// for (var i = 1; i <= genArr.length; i++) {
-//   const imgs = JSON.stringify(genArr[i - 1]);
-//   // console.log(genArr[i]);
-//   // if (i == 0) console.log(imgs);
-//   db.query(
-//     `update Services set images='${imgs}' where Sid=${i};`,
-//     (err, result) => {
-//       if (err) {
-//         console.log(err);
-//       } else {
-//         console.log(i, "Success");
-//       }
-//     }
-//   );
-//   console.log(i, "Done");
-// }
+for (var i = 1; i <= genArr.length; i++) {
+  const imgs = JSON.stringify(genArr[i - 1]);
+  // console.log(genArr[i]);
+  // if (i == 0) console.log(imgs);
+  db.query(
+    `update Services set imgs='${imgs}' where Sid=${i};`,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log(i, "Success");
+      }
+    }
+  );
+  console.log(i, "Done");
+}
+*/
 
 // export const dummySPs = [
 //   {

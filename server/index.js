@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const path = require("path");
-const PORT = 5427;
+const PORT = process.env.PORT || 5427;
 // const PORT = process.env.PORT || 5427;
 
 //===========Handling JSON type requests===========================
@@ -13,17 +13,12 @@ app.use(bodyParser.json({ limit: "200mb" }));
 
 //===========Disabling CORS restrictions For React Development Server Start===========================
 const corsOptions = {
-  origin: [
-    "http://localhost:1682",
-  ],
+  origin: ["http://localhost:1682", "http://localhost:5427"],
   credentials: true,
   optionSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
 //===========Disabling CORS restrictions For React Development Server End========================
-
-
-
 
 app.use(express.static(path.join(__dirname, "views")));
 

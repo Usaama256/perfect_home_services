@@ -24,7 +24,7 @@ router.post("/signup", async (req, res) => {
       if (profilePic.length > 0) {
         uploadImage(profilePic, phone, "users")
           .then((result) => {
-            const profilePic = `http://localhost:5427/images/users/${result}`;
+            const profilePic = `http://perfect-home-services-lruh4.ondigitalocean.app/images/users/${result}`;
             const new_user = {
               username: email.split("@")[0],
               email,
@@ -178,6 +178,61 @@ router.get("/fetchServices", async (req, res) => {
 router.get("/fetchSPs", async (req, res) => {
   db.query(
     "select SPid, SPname, email, contact, logoImg, description, status, Approved, location, reviewsNo, rateValue, Sid  from ServiceProviders join Ratings using (SPid) where status='active' and approved='1';",
+    (err, sps) => {
+      if (err) {
+        console.log(err);
+        res.status(500).json("Something went wrong");
+      } else {
+        if (sps.length <= 0) {
+          res.status(404).json("No records Found");
+        } else {
+          const filtered = [];
+          sps.forEach(async (i, n) => {
+            db.query(
+              `select * from SpProducts where SPid=${i.SPid};`,
+              (err, pdts) => {
+                if (err) {
+                  console.log(err);
+                  res.status(500).json("Something went wrong");
+                } else {
+                  const filteredPdts = pdts.map((i, n) => {
+                    return {
+                      ...i,
+                      images: JSON.parse(i.images),
+                    };
+                  });
+                  const sp = {
+                    id: i.SPid,
+                    desc: i.description,
+                    title: i.SPname,
+                    sId: i.Sid,
+                    location: i.location,
+                    logo: i.logoImg,
+                    email: [i.email],
+                    tel: [i.contact],
+                    rating: { value: i.rateValue, reviews: i.reviewsNo },
+                    pricing: filteredPdts,
+                  };
+                  filtered.push(sp);
+
+                  if (filtered.length == sps.length) {
+                    return res.status(200).json(filtered);
+                  }
+                }
+              }
+            );
+          });
+        }
+      }
+    }
+  );
+});
+
+//API for user Viewing  all service providers of a given service
+router.get("/fetchSPsService/:Sid", async (req, res) => {
+  const Sid = parseInt(req.params.Sid, 10);
+  db.query(
+    `select SPid, SPname, email, contact, logoImg, description, status, Approved, location, reviewsNo, rateValue, Sid  from ServiceProviders join Ratings using (SPid) where Sid='${Sid}' and status='active' and approved='1';`,
     (err, sps) => {
       if (err) {
         console.log(err);
