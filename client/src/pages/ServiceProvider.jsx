@@ -481,7 +481,7 @@ const ServiceProvider = () => {
             </Card>
           </div>
           <div className="row6" id="rate_us">
-            <h3 className="sub_title"> Rate Us</h3>
+            <h3 className="sub_title">Rate Service Provider</h3>
             <MyRating
               setValue={setNewRating}
               valueOut={newRating}
